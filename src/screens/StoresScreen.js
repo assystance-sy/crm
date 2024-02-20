@@ -1,34 +1,23 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
 import {getStores} from '../services/apiServices/storeApiService';
+import {useNavigation} from '@react-navigation/native';
 
 const StoreScreen = () => {
+  const navigation = useNavigation();
   const [stores, setStores] = useState([]);
 
-  useEffect(() => {
-    fetchStoreList();
-  }, []);
-
-  const fetchStoreList = async () => {
-    try {
-      const response = await getStores({
-        page: 1,
-        limit: 99,
-        sort: 'code',
-        populate: ['merchant', 'address.city', 'address.province', 'staff'],
-      });
-      setStores(response.data);
-    } catch (error) {
-      console.error('Error fetching store list:', error);
-      setStores([]);
-    }
+  const handleStorePress = id => {
+    navigation.navigate('Store Details', {id});
   };
 
   const renderStoreItem = ({item}) => {
-    const {merchant, address, code, staff} = item;
+    const {merchant, address, code, staff, _id} = item;
     const {street, city, province, postalCode} = address;
     return (
-      <View style={styles.storeItem}>
+      <TouchableOpacity
+        style={styles.storeItem}
+        onPress={() => handleStorePress(_id)}>
         <View style={styles.storeListItem}>
           <Text style={styles.storeListItemLabel}>MERCHANT:</Text>
           <Text style={styles.storeListItemValue}>{merchant.name}</Text>
@@ -66,9 +55,28 @@ const StoreScreen = () => {
             </>
           );
         })}
-      </View>
+      </TouchableOpacity>
     );
   };
+
+  const fetchStoreList = async () => {
+    try {
+      const response = await getStores({
+        page: 1,
+        limit: 99,
+        sort: 'code',
+        populate: ['merchant', 'address.city', 'address.province', 'staff'],
+      });
+      setStores(response.data);
+    } catch (error) {
+      console.error('Error fetching store list:', error);
+      setStores([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchStoreList();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -100,6 +108,7 @@ const styles = StyleSheet.create({
   },
   storeListItem: {
     flexDirection: 'row',
+    paddingVertical: 5,
   },
   storeListItemLabel: {
     width: '25%',
@@ -111,7 +120,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   storeItem: {
-    paddingVertical: 10,
+    paddingVertical: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#cccccc',
   },

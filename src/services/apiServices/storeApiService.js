@@ -16,3 +16,15 @@ export const getStores = async (query = {}) => {
     throw error;
   }
 };
+
+export const getStore = async (id, query = {}) => {
+  try {
+    const response = await apiService.get(
+      `${Config.API_BASE_URL}/api/${Config.API_VERSION}/store/${id}`,
+      {params: query},
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
