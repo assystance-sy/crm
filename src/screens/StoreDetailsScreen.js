@@ -97,10 +97,6 @@ const StoreDetailsScreen = ({route, navigation}) => {
           <Text style={styles.storeItemValue}>{remark}</Text>
         </View>
       </View>
-
-      <TouchableOpacity style={styles.editButton}>
-        <Text style={styles.buttonText}>Edit</Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -134,23 +130,6 @@ const styles = StyleSheet.create({
   store: {
     paddingVertical: 10,
     rowGap: 30,
-  },
-  editButton: {
-    backgroundColor: '#cccccc',
-    alignItems: 'center',
-    paddingVertical: 15,
-    borderRadius: 10,
-    padding: 40,
-    width: '80%',
-    alignSelf: 'center',
-    marginBottom: 20,
-    marginTop: 20,
-  },
-  buttonText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'black',
-    textTransform: 'uppercase',
   },
 });
 

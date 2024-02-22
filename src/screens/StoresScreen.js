@@ -86,10 +86,6 @@ const StoreScreen = () => {
         keyExtractor={item => item._id.toString()}
         contentContainerStyle={styles.storeList}
       />
-
-      <TouchableOpacity style={styles.addButton}>
-        <Text style={styles.buttonText}>Add</Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -124,23 +120,6 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#cccccc',
-  },
-  addButton: {
-    backgroundColor: '#cccccc',
-    alignItems: 'center',
-    paddingVertical: 15,
-    borderRadius: 10,
-    padding: 40,
-    width: '80%',
-    alignSelf: 'center',
-    marginBottom: 20,
-    marginTop: 20,
-  },
-  buttonText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'black',
-    textTransform: 'uppercase',
   },
 });
 

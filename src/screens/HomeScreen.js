@@ -1,6 +1,7 @@
 import * as React from 'react';
-import {View, TouchableOpacity, Text, StyleSheet} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import Button from '../components/Button';
 
 function HomeScreen() {
   const navigation = useNavigation();
@@ -19,15 +20,21 @@ function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.button} onPress={handleStoresPress}>
-        <Text style={styles.buttonText}>Stores</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={handleNewOrderPress}>
-        <Text style={styles.buttonText}>New Order</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={handleViewOrdersPress}>
-        <Text style={styles.buttonText}>View Orders</Text>
-      </TouchableOpacity>
+      <Button
+        onPress={handleStoresPress}
+        label={'Stores'}
+        style={styles.button}
+      />
+      <Button
+        onPress={handleNewOrderPress}
+        label={'New Order'}
+        style={styles.button}
+      />
+      <Button
+        onPress={handleViewOrdersPress}
+        label={'View Orders'}
+        style={styles.button}
+      />
     </View>
   );
 }
@@ -38,20 +45,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f0f0f0',
+    rowGap: 50,
   },
   button: {
-    backgroundColor: '#cccccc',
-    padding: 40,
-    marginVertical: 30,
-    width: '80%',
-    alignItems: 'center',
-    borderRadius: 10,
-  },
-  buttonText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'black',
-    textTransform: 'uppercase',
+    paddingVertical: 40,
   },
 });
 
