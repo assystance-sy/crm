@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   buttonText: {
-    fontSize: 50,
+    fontSize: 24,
     fontWeight: 'bold',
     color: 'black',
     textTransform: 'uppercase',

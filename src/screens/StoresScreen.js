@@ -111,12 +111,13 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   storeListItemLabel: {
-    width: '25%',
-    fontSize: 24,
+    width: '35%',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   storeListItemValue: {
     flexGrow: 1,
-    fontSize: 24,
+    fontSize: 18,
     flex: 1,
   },
   storeItem: {
@@ -136,7 +137,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   buttonText: {
-    fontSize: 50,
+    fontSize: 24,
     fontWeight: 'bold',
     color: 'black',
     textTransform: 'uppercase',

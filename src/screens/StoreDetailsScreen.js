@@ -121,13 +121,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   storeItemLabel: {
-    width: '25%',
-    fontSize: 24,
+    width: '35%',
+    fontSize: 18,
     textTransform: 'uppercase',
+    fontWeight: 'bold',
   },
   storeItemValue: {
     flexGrow: 1,
-    fontSize: 24,
+    fontSize: 18,
     flex: 1,
   },
   store: {
@@ -146,7 +147,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   buttonText: {
-    fontSize: 50,
+    fontSize: 24,
     fontWeight: 'bold',
     color: 'black',
     textTransform: 'uppercase',
