@@ -7,10 +7,7 @@ const apiService = axios.create({
 
 export const getStores = async (query = {}) => {
   try {
-    const response = await apiService.get(
-      `${Config.API_BASE_URL}/api/${Config.API_VERSION}/store`,
-      {params: query},
-    );
+    const response = await apiService.get('/store', {params: query});
     return response.data;
   } catch (error) {
     throw error;
@@ -19,10 +16,7 @@ export const getStores = async (query = {}) => {
 
 export const getStore = async (id, query = {}) => {
   try {
-    const response = await apiService.get(
-      `${Config.API_BASE_URL}/api/${Config.API_VERSION}/store/${id}`,
-      {params: query},
-    );
+    const response = await apiService.get(`/store/${id}`, {params: query});
     return response.data;
   } catch (error) {
     throw error;
