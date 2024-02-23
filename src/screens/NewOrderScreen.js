@@ -55,7 +55,7 @@ const NewOrderScreen = () => {
 
       const {_id: purchaseOrderId} = data || {};
 
-      navigation.navigate('Scanner', {id: purchaseOrderId});
+      navigation.navigate('Scanner', {purchaseOrderId});
     } catch (error) {
       console.error('Error creating purchase order:', error);
     }
