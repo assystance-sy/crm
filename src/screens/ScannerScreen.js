@@ -1,5 +1,5 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {View, StyleSheet, Linking, Alert} from 'react-native';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
+import {View, StyleSheet, Linking, Alert, Text} from 'react-native';
 import {
   Camera,
   useCameraDevice,
@@ -7,8 +7,10 @@ import {
 } from 'react-native-vision-camera';
 import {getProducts} from '../services/apiServices/productApiService';
 import Button from '../components/Button';
+import DataContext from '../services/DataContext';
 
 const ScannerScreen = ({route, navigation}) => {
+  const {sharedData} = useContext(DataContext);
   const device = useCameraDevice('back');
   const [cameraOn, setCameraOn] = useState(false);
   const [barcode, setBarcode] = useState('');
@@ -38,10 +40,10 @@ const ScannerScreen = ({route, navigation}) => {
         return;
       }
 
-      navigation.navigate('Product', {
-        id: matchedProduct?._id,
-        purchaseOrderId: route.params.purchaseOrderId,
-      });
+      setBarcode('');
+      setCameraOn(false);
+
+      navigation.navigate('Product', {id: matchedProduct?._id});
     } catch (error) {
       console.error('Error fetching product:', error);
     }
@@ -74,14 +76,21 @@ const ScannerScreen = ({route, navigation}) => {
 
   return (
     <View style={styles.container}>
-      {device && (
-        <Camera
-          style={styles.camera}
-          device={device}
-          isActive={cameraOn}
-          codeScanner={codeScanner}
-        />
-      )}
+      <View>
+        <Text
+          style={
+            styles.orderInfo
+          }>{`Order Number: ${sharedData.purchaseOrderNumber}`}</Text>
+
+        {device && (
+          <Camera
+            style={styles.camera}
+            device={device}
+            isActive={cameraOn}
+            codeScanner={codeScanner}
+          />
+        )}
+      </View>
 
       <View style={styles.buttonGroup}>
         <Button label={'Scan'} onPress={onScanPress} />
@@ -100,15 +109,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   camera: {
-    top: 50,
     width: '90%',
     aspectRatio: 1,
     alignSelf: 'center',
   },
-  productContainer: {},
   buttonGroup: {
     flexDirection: 'column',
     gap: 20,
+  },
+  orderInfo: {
+    textTransform: 'uppercase',
+    alignSelf: 'center',
+    fontSize: 24,
+    marginBottom: 40,
   },
 });
 

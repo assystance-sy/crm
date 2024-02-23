@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {View, StyleSheet, Alert} from 'react-native';
 import {createPurchaseOrder} from '../services/apiServices/purchaseOrderApiService';
 import {getMerchants} from '../services/apiServices/merchantApiService';
@@ -6,8 +6,10 @@ import {getStores} from '../services/apiServices/storeApiService';
 import {useNavigation} from '@react-navigation/native';
 import Picker from '../components/Picker';
 import Button from '../components/Button';
+import DataContext from '../services/DataContext';
 
 const NewOrderScreen = () => {
+  const {updateSharedData} = useContext(DataContext);
   const navigation = useNavigation();
   const [merchants, setMerchants] = useState([]);
   const [stores, setStores] = useState([]);
@@ -53,9 +55,11 @@ const NewOrderScreen = () => {
         store: selectedStoreId,
       });
 
-      const {_id: purchaseOrderId} = data || {};
+      const {_id: purchaseOrderId, orderNumber} = data || {};
 
-      navigation.navigate('Scanner', {purchaseOrderId});
+      updateSharedData({purchaseOrderId, purchaseOrderNumber: orderNumber});
+
+      navigation.navigate('Scanner');
     } catch (error) {
       console.error('Error creating purchase order:', error);
     }
@@ -91,7 +95,6 @@ const NewOrderScreen = () => {
             value: store?._id,
           }))}
           placeholder={{label: 'Select a store', value: null}}
-          style={styles.pickerStyle}
         />
       </View>
 

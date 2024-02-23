@@ -12,3 +12,12 @@ export const getProducts = async (query = {}) => {
     throw error;
   }
 };
+
+export const getProduct = async (id, query = {}) => {
+  try {
+    const response = await apiService.get(`/product/${id}`, {params: query});
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
