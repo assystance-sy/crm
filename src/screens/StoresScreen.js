@@ -63,7 +63,7 @@ const StoreScreen = () => {
     try {
       const response = await getStores({
         page: 1,
-        limit: 99,
+        limit: 999,
         sort: 'code',
         populate: ['merchant', 'address.city', 'address.province', 'staff'],
       });

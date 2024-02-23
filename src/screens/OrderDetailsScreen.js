@@ -64,6 +64,10 @@ const OrderDetailsScreen = ({route, navigation}) => {
           {DateTime.fromISO(createdAt).toFormat('dd/MM/yyyy HH:mm')}
         </Text>
       </View>
+      <View style={styles.orderItem}>
+        <Text style={styles.orderItemLabel}>No. of Items:</Text>
+        <Text style={styles.orderItemValue}>{orderItems.length}</Text>
+      </View>
 
       <ScrollView
         contentContainerStyle={styles.orderItemListContentContainer}

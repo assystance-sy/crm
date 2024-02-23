@@ -9,6 +9,7 @@ import ScannerScreen from '../screens/ScannerScreen';
 import ProductScreen from '../screens/ProductScreen';
 import OrdersScreen from '../screens/OrdersScreen';
 import OrderDetailsScreen from '../screens/OrderDetailsScreen';
+import NewProductScreen from '../screens/NewProductScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -24,6 +25,7 @@ function MainNavigation() {
         <Stack.Screen name="Scanner" component={ScannerScreen} />
         <Stack.Screen name="Product" component={ProductScreen} />
         <Stack.Screen name="Order Details" component={OrderDetailsScreen} />
+        <Stack.Screen name="New Product" component={NewProductScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

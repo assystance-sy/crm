@@ -12,3 +12,12 @@ export const getPackagings = async (query = {}) => {
     throw error;
   }
 };
+
+export const createPackaging = async data => {
+  try {
+    const response = await apiService.post('/packaging', data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

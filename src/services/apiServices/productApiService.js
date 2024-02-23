@@ -21,3 +21,12 @@ export const getProduct = async (id, query = {}) => {
     throw error;
   }
 };
+
+export const createProduct = async data => {
+  try {
+    const response = await apiService.post('/product', data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

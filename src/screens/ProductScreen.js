@@ -113,8 +113,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   productImage: {
-    width: '80%',
-    aspectRatio: 1,
+    width: '50%',
+    aspectRatio: '4/3',
     objectFit: 'contain',
     alignSelf: 'center',
   },
@@ -134,11 +134,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   productContainer: {
-    rowGap: 20,
+    rowGap: 10,
   },
   quantityButton: {
-    width: 60,
-    paddingHorizontal: 10,
+    width: 45,
+    paddingHorizontal: 0,
     aspectRatio: 1,
   },
   quantityButtonGroup: {

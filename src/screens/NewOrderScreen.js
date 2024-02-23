@@ -50,14 +50,23 @@ const NewOrderScreen = () => {
         return;
       }
 
+      const merchantId = stores.find(
+        store => store._id === selectedStoreId,
+      ).merchant;
+
       const {data} = await createPurchaseOrder({
-        merchant: stores.find(store => store._id === selectedStoreId).merchant,
+        merchant: merchantId,
         store: selectedStoreId,
       });
 
       const {_id: purchaseOrderId, orderNumber} = data || {};
 
-      updateSharedData({purchaseOrderId, purchaseOrderNumber: orderNumber});
+      updateSharedData({
+        purchaseOrderId,
+        purchaseOrderNumber: orderNumber,
+        merchantId,
+        storeId: selectedStoreId,
+      });
 
       navigation.navigate('Scanner');
     } catch (error) {

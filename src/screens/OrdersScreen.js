@@ -47,6 +47,7 @@ const OrdersScreen = () => {
     try {
       const response = await getPurchaseOrders({
         populate: ['merchant', 'store'],
+        limit: 999,
       });
       setOrders(response.data);
     } catch (error) {

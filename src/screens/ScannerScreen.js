@@ -33,7 +33,7 @@ const ScannerScreen = ({route, navigation}) => {
           `No product matches with barcode ${code}`,
           [
             {text: 'Try again', onPress: onScanPress},
-            {text: 'Manual Input', onPress: onManualInputPress},
+            {text: 'Manual Input', onPress: () => onManualInputPress(code)},
           ],
         );
 
@@ -43,7 +43,7 @@ const ScannerScreen = ({route, navigation}) => {
       setBarcode('');
       setCameraOn(false);
 
-      navigation.navigate('Product', {id: matchedProduct?._id});
+      navigation.push('Product', {id: matchedProduct?._id});
     } catch (error) {
       console.error('Error fetching product:', error);
     }
@@ -61,10 +61,8 @@ const ScannerScreen = ({route, navigation}) => {
     setCameraOn(true);
   };
 
-  const onManualInputPress = async () => {
-    navigation.navigate('New Product', {
-      purchaseOrderId: route.params.purchaseOrderId,
-    });
+  const onManualInputPress = async code => {
+    navigation.push('New Product', {code});
   };
 
   useEffect(() => {
@@ -120,7 +118,7 @@ const styles = StyleSheet.create({
   orderInfo: {
     textTransform: 'uppercase',
     alignSelf: 'center',
-    fontSize: 24,
+    fontSize: 18,
     marginBottom: 40,
   },
 });
