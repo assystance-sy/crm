@@ -108,13 +108,13 @@ const styles = StyleSheet.create({
   },
   storeListItemLabel: {
     width: '35%',
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: 'bold',
     textTransform: 'uppercase',
   },
   storeListItemValue: {
     flexGrow: 1,
-    fontSize: 18,
+    fontSize: 14,
     flex: 1,
   },
   storeItem: {

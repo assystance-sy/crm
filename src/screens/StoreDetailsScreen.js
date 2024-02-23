@@ -11,7 +11,7 @@ import {getStore} from '../services/apiServices/storeApiService';
 
 const StoreDetailsScreen = ({route, navigation}) => {
   const {id} = route.params;
-  const [store, setStore] = useState([]);
+  const [store, setStore] = useState({});
   const {merchant, address, code, staff = [], remark, location} = store || {};
   const {street, city, province, postalCode} = address || {};
   const {coordinates} = location || {};
@@ -118,13 +118,13 @@ const styles = StyleSheet.create({
   },
   storeItemLabel: {
     width: '35%',
-    fontSize: 18,
+    fontSize: 14,
     textTransform: 'uppercase',
     fontWeight: 'bold',
   },
   storeItemValue: {
     flexGrow: 1,
-    fontSize: 18,
+    fontSize: 14,
     flex: 1,
   },
   store: {

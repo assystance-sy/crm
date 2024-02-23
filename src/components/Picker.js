@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   pickerLabel: {
-    fontSize: 18,
+    fontSize: 14,
     textTransform: 'uppercase',
   },
 });

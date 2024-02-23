@@ -89,13 +89,13 @@ const styles = StyleSheet.create({
   },
   orderListItemLabel: {
     width: '35%',
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: 'bold',
     textTransform: 'uppercase',
   },
   orderListItemValue: {
     flexGrow: 1,
-    fontSize: 18,
+    fontSize: 14,
     flex: 1,
   },
   orderItem: {

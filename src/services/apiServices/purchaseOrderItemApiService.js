@@ -13,3 +13,14 @@ export const createPurchaseOrderItem = async data => {
     throw error;
   }
 };
+
+export const getPurchaseOrderItems = async (query = {}) => {
+  try {
+    const response = await apiService.get('/purchaseOrderItem', {
+      params: query,
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

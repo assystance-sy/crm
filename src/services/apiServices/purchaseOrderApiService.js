@@ -14,9 +14,11 @@ export const createPurchaseOrder = async data => {
   }
 };
 
-export const getPurchaseOrder = async id => {
+export const getPurchaseOrder = async (id, query) => {
   try {
-    const response = await apiService.get(`/purchaseOrder/${id}`);
+    const response = await apiService.get(`/purchaseOrder/${id}`, {
+      params: query,
+    });
     return response.data;
   } catch (error) {
     throw error;

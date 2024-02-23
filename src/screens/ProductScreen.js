@@ -124,13 +124,13 @@ const styles = StyleSheet.create({
   },
   productInfoLabel: {
     width: '30%',
-    fontSize: 18,
+    fontSize: 14,
     textTransform: 'uppercase',
     fontWeight: 'bold',
   },
   productInfoValue: {
     flexGrow: 1,
-    fontSize: 18,
+    fontSize: 14,
     flex: 1,
   },
   productContainer: {
