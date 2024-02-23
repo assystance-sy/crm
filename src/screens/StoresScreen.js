@@ -19,15 +19,15 @@ const StoreScreen = () => {
         style={styles.storeItem}
         onPress={() => handleStorePress(_id)}>
         <View style={styles.storeListItem}>
-          <Text style={styles.storeListItemLabel}>MERCHANT:</Text>
+          <Text style={styles.storeListItemLabel}>Merchant:</Text>
           <Text style={styles.storeListItemValue}>{merchant.name}</Text>
         </View>
         <View style={styles.storeListItem}>
-          <Text style={styles.storeListItemLabel}>STORE ID:</Text>
+          <Text style={styles.storeListItemLabel}>Store Id:</Text>
           <Text style={styles.storeListItemValue}>{code}</Text>
         </View>
         <View style={styles.storeListItem}>
-          <Text style={styles.storeListItemLabel}>ADDRESS:</Text>
+          <Text style={styles.storeListItemLabel}>Address:</Text>
           <Text
             style={
               styles.storeListItemValue
@@ -37,13 +37,13 @@ const StoreScreen = () => {
           return (
             <>
               <View style={styles.storeListItem}>
-                <Text style={styles.storeListItemLabel}>MANAGER:</Text>
+                <Text style={styles.storeListItemLabel}>Manager:</Text>
                 <Text style={styles.storeListItemValue}>
                   {storeStaff.firstName}
                 </Text>
               </View>
               <View style={styles.storeListItem}>
-                <Text style={styles.storeListItemLabel}>PHONE:</Text>
+                <Text style={styles.storeListItemLabel}>Phone:</Text>
                 <View>
                   {storeStaff.phones?.map(phone => (
                     <Text style={styles.storeListItemValue}>
@@ -110,6 +110,7 @@ const styles = StyleSheet.create({
     width: '35%',
     fontSize: 18,
     fontWeight: 'bold',
+    textTransform: 'uppercase',
   },
   storeListItemValue: {
     flexGrow: 1,

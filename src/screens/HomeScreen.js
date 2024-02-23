@@ -15,7 +15,7 @@ function HomeScreen() {
   };
 
   const handleViewOrdersPress = () => {
-    navigation.navigate('View Orders');
+    navigation.navigate('Orders');
   };
 
   return (
@@ -32,7 +32,7 @@ function HomeScreen() {
       />
       <Button
         onPress={handleViewOrdersPress}
-        label={'View Orders'}
+        label={'Orders'}
         style={styles.button}
       />
     </View>

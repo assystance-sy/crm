@@ -4,10 +4,10 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
 import StoresScreen from '../screens/StoresScreen';
 import NewOrderScreen from '../screens/NewOrderScreen';
-import ViewOrdersScreen from '../screens/ViewOrdersScreen';
 import StoreDetailsScreen from '../screens/StoreDetailsScreen';
 import ScannerScreen from '../screens/ScannerScreen';
 import ProductScreen from '../screens/ProductScreen';
+import OrdersScreen from '../screens/OrdersScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,7 +18,7 @@ function MainNavigation() {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Stores" component={StoresScreen} />
         <Stack.Screen name="New Order" component={NewOrderScreen} />
-        <Stack.Screen name="View Orders" component={ViewOrdersScreen} />
+        <Stack.Screen name="Orders" component={OrdersScreen} />
         <Stack.Screen name="Store Details" component={StoreDetailsScreen} />
         <Stack.Screen name="Scanner" component={ScannerScreen} />
         <Stack.Screen name="Product" component={ProductScreen} />

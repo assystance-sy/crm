@@ -5,9 +5,9 @@ const apiService = axios.create({
   baseURL: `${Config.API_BASE_URL}/api/${Config.API_VERSION}`,
 });
 
-export const createPurchaseOrder = async () => {
+export const createPurchaseOrder = async data => {
   try {
-    const response = await apiService.post('/purchaseOrder');
+    const response = await apiService.post('/purchaseOrder', data);
     return response.data;
   } catch (error) {
     throw error;
@@ -17,6 +17,15 @@ export const createPurchaseOrder = async () => {
 export const getPurchaseOrder = async id => {
   try {
     const response = await apiService.get(`/purchaseOrder/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getPurchaseOrders = async (query = {}) => {
+  try {
+    const response = await apiService.get('/purchaseOrder', {params: query});
     return response.data;
   } catch (error) {
     throw error;
