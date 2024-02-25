@@ -1,19 +1,32 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {getPurchaseOrders} from '../services/apiServices/purchaseOrderApiService';
 import {DateTime} from 'luxon';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const OrdersScreen = () => {
   const navigation = useNavigation();
   const [orders, setOrders] = useState([]);
 
-  const handleOrderPress = id => {
-    navigation.navigate('Order Details', {id});
+  const handleOrderPress = order => {
+    navigation.navigate('Order Details', {order});
   };
 
+  const fetchOrders = async () => {
+    const data = await AsyncStorage.getItem('orders');
+    if (data === null) {
+      setOrders([]);
+    } else {
+      setOrders(JSON.parse(data).sort((a, b) => b.createdAt - a.createdAt));
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
   const renderOrderItem = ({item}) => {
-    const {merchant, store, orderNumber, _id, createdAt} = item;
+    const {items = [], store, orderNumber, _id, createdAt} = item;
     return (
       <TouchableOpacity
         style={styles.orderItem}
@@ -24,7 +37,7 @@ const OrdersScreen = () => {
         </View>
         <View style={styles.orderListItem}>
           <Text style={styles.orderListItemLabel}>Merchant:</Text>
-          <Text style={styles.orderListItemValue}>{merchant?.name}</Text>
+          <Text style={styles.orderListItemValue}>{store.merchant}</Text>
         </View>
         <View style={styles.orderListItem}>
           <Text style={styles.orderListItemLabel}>Store:</Text>
@@ -39,33 +52,20 @@ const OrdersScreen = () => {
             {DateTime.fromISO(createdAt).toFormat('dd/MM/yyyy HH:mm')}
           </Text>
         </View>
+        <View style={styles.orderListItem}>
+          <Text style={styles.orderListItemLabel}>No. of Items:</Text>
+          <Text style={styles.orderListItemValue}>{items.length}</Text>
+        </View>
       </TouchableOpacity>
     );
   };
-
-  const fetchPurchaseOrderList = async () => {
-    try {
-      const response = await getPurchaseOrders({
-        populate: ['merchant', 'store'],
-        limit: 999,
-      });
-      setOrders(response.data);
-    } catch (error) {
-      console.error('Error fetching order list:', error);
-      setOrders([]);
-    }
-  };
-
-  useEffect(() => {
-    fetchPurchaseOrderList();
-  }, []);
 
   return (
     <View style={styles.container}>
       <FlatList
         data={orders}
         renderItem={renderOrderItem}
-        keyExtractor={item => item._id.toString()}
+        keyExtractor={item => item.orderNumber}
         contentContainerStyle={styles.orderList}
       />
     </View>
@@ -77,7 +77,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f0f0f0',
     paddingHorizontal: 20,
-    paddingTop: 20,
     justifyContent: 'space-between',
   },
   orderList: {
