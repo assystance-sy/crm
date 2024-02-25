@@ -1,26 +1,25 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {View, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
-import {getStores} from '../services/apiServices/storeApiService';
 import {useNavigation} from '@react-navigation/native';
+import stores from '../database/stores.json';
 
 const StoreScreen = () => {
   const navigation = useNavigation();
-  const [stores, setStores] = useState([]);
 
   const handleStorePress = id => {
     navigation.navigate('Store Details', {id});
   };
 
   const renderStoreItem = ({item}) => {
-    const {merchant, address, code, staff, _id} = item;
+    const {merchant, address, code, staffs = []} = item;
     const {street, city, province, postalCode} = address;
     return (
       <TouchableOpacity
         style={styles.storeItem}
-        onPress={() => handleStorePress(_id)}>
+        onPress={() => handleStorePress(code)}>
         <View style={styles.storeListItem}>
           <Text style={styles.storeListItemLabel}>Merchant:</Text>
-          <Text style={styles.storeListItemValue}>{merchant.name}</Text>
+          <Text style={styles.storeListItemValue}>{merchant}</Text>
         </View>
         <View style={styles.storeListItem}>
           <Text style={styles.storeListItemLabel}>Store Id:</Text>
@@ -31,9 +30,9 @@ const StoreScreen = () => {
           <Text
             style={
               styles.storeListItemValue
-            }>{`${street}, ${city.name}, ${province.abbreviation}, ${postalCode}`}</Text>
+            }>{`${street}, ${city}, ${province}, ${postalCode}`}</Text>
         </View>
-        {staff.map(storeStaff => {
+        {staffs.map(storeStaff => {
           return (
             <>
               <View style={styles.storeListItem}>
@@ -46,9 +45,7 @@ const StoreScreen = () => {
                 <Text style={styles.storeListItemLabel}>Phone:</Text>
                 <View>
                   {storeStaff.phones?.map(phone => (
-                    <Text style={styles.storeListItemValue}>
-                      {phone.number}
-                    </Text>
+                    <Text style={styles.storeListItemValue}>{phone}</Text>
                   ))}
                 </View>
               </View>
@@ -59,31 +56,12 @@ const StoreScreen = () => {
     );
   };
 
-  const fetchStoreList = async () => {
-    try {
-      const response = await getStores({
-        page: 1,
-        limit: 999,
-        sort: 'code',
-        populate: ['merchant', 'address.city', 'address.province', 'staff'],
-      });
-      setStores(response.data);
-    } catch (error) {
-      console.error('Error fetching store list:', error);
-      setStores([]);
-    }
-  };
-
-  useEffect(() => {
-    fetchStoreList();
-  }, []);
-
   return (
     <View style={styles.container}>
       <FlatList
         data={stores}
         renderItem={renderStoreItem}
-        keyExtractor={item => item._id.toString()}
+        keyExtractor={item => item.code}
         contentContainerStyle={styles.storeList}
       />
     </View>
@@ -107,7 +85,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   storeListItemLabel: {
-    width: '35%',
+    width: '25%',
     fontSize: 14,
     fontWeight: 'bold',
     textTransform: 'uppercase',
