@@ -9,95 +9,57 @@ import {
   ScrollView,
 } from 'react-native';
 import Button from '../components/Button';
-import {
-  createProduct,
-  getProducts,
-} from '../services/apiServices/productApiService';
-import {
-  createPackaging,
-  getPackagings,
-} from '../services/apiServices/packagingApiService';
 import DataContext from '../services/DataContext';
-import {createPurchaseOrderItem} from '../services/apiServices/purchaseOrderItemApiService';
 import axios from 'axios';
+import products from '../database/products.json';
+import images from '../assets/images';
 
 const NewProductScreen = ({route, navigation}) => {
   const {sharedData} = useContext(DataContext);
   const [product, setProduct] = useState({});
-  const [packaging, setPackaging] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [barcode, setBarcode] = useState('');
+  const [matchedProducts, setMatchedProducts] = useState([]);
 
-  const fetchProducts = async () => {
-    if (!product?.barcode) {
-      setProduct({});
-      setPackaging({});
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await getProducts({barcode: product?.barcode});
-      const matchedProduct = response.data[0];
-
-      if (matchedProduct) {
-        setProduct(matchedProduct);
-        await fetchPackagings(matchedProduct._id);
-      }
-    } catch (error) {
-      console.error('Error fetching product:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchPackagings = async productId => {
-    try {
-      setLoading(true);
-      const response = await getPackagings({product: productId});
-      const matchedPackaging = response.data[0];
-
-      if (matchedPackaging) {
-        setPackaging(matchedPackaging);
-      }
-    } catch (error) {
-      console.error('Error fetching packaging:', error);
-    } finally {
-      setLoading(false);
+  const fetchProducts = () => {
+    const existingProducts = products.filter(p => p.barcode.includes(barcode));
+    if (existingProducts.length >= 1) {
+      setMatchedProducts(existingProducts);
+      setProduct(existingProducts[0]);
     }
   };
 
   const handleProductInputChange = (key, value) => {
-    setProduct(prevState => ({...prevState, [key]: value, _id: null}));
-  };
+    setProduct(prevState => ({...prevState, [key]: value}));
 
-  const handlePackagingInputChange = (key, value) => {
-    setPackaging(prevState => ({...prevState, [key]: value, _id: null}));
+    if (key === 'barcode') {
+      setBarcode(value);
+    }
   };
 
   const handleQuantityPress = async quantity => {
     try {
-      if (!packaging?._id && !packaging?.quantity) {
+      if (!product?.packSize) {
         Alert.alert('Empty Pack Size', 'Please input the pack size', [
           {text: 'OK', onPress: () => {}},
         ]);
         return;
       }
 
-      if (!product?._id && !product?.name) {
+      if (!product?.name) {
         Alert.alert('Empty Product Name', 'Please input the product name', [
           {text: 'OK', onPress: () => {}},
         ]);
         return;
       }
 
-      if (!product?._id && !product?.sku) {
+      if (!product?.sku) {
         Alert.alert('Empty Product Code', 'Please input the product code', [
           {text: 'OK', onPress: () => {}},
         ]);
         return;
       }
 
-      if (!product?._id && !product?.barcode) {
+      if (!product?.barcode) {
         Alert.alert(
           'Empty Product Barcode',
           'Please input the product barcode',
@@ -106,34 +68,12 @@ const NewProductScreen = ({route, navigation}) => {
         return;
       }
 
-      let productId = product._id;
-      let packagingId = packaging._id;
-
-      if (!productId) {
-        const response = await createProduct({
-          name: product.name,
-          sku: product.sku,
-          barcode: product.barcode,
-        });
-        productId = response.data._id;
-        setProduct(response.data);
-      }
-
-      if (!packaging._id) {
-        const response = await createPackaging({
-          product: productId,
-          quantity: packaging.quantity,
-        });
-        packagingId = response.data._id;
-        setPackaging(response.data);
-      }
-
-      await createPurchaseOrderItem({
-        product: productId,
-        purchaseOrder: sharedData.purchaseOrderId,
-        packaging: packagingId,
-        quantity,
-      });
+      // await createPurchaseOrderItem({
+      //   product: productId,
+      //   purchaseOrder: sharedData.purchaseOrderId,
+      //   packaging: packagingId,
+      //   quantity,
+      // });
 
       navigation.goBack();
     } catch (e) {
@@ -151,12 +91,13 @@ const NewProductScreen = ({route, navigation}) => {
     }
   };
 
-  const handleCancelPress = () => {
-    navigation.goBack();
+  const handleScanPress = () => {
+    setProduct({});
+    navigation.push('Scanner');
   };
 
   useEffect(() => {
-    if (route.params.code) {
+    if (route?.params?.code) {
       handleProductInputChange('barcode', route.params.code);
     }
   }, []);
@@ -165,7 +106,7 @@ const NewProductScreen = ({route, navigation}) => {
     <View style={styles.container}>
       <ScrollView>
         <View style={styles.productContainer}>
-          <Image source={{uri: product?.image}} style={styles.productImage} />
+          <Image source={images[product.image]} style={styles.productImage} />
           <View style={styles.productInfo}>
             <Text style={styles.productInfoLabel}>Product Name:</Text>
             <TextInput
@@ -173,7 +114,6 @@ const NewProductScreen = ({route, navigation}) => {
               value={product?.name || ''}
               onChangeText={value => handleProductInputChange('name', value)}
               multiline={true}
-              editable={!product?._id && !loading}
             />
           </View>
           <View style={styles.productInfo}>
@@ -181,11 +121,10 @@ const NewProductScreen = ({route, navigation}) => {
             <TextInput
               style={{...styles.productInfoValue, ...styles.textInput}}
               keyboardType="numeric"
-              value={packaging?.quantity?.toString() || ''}
+              value={product?.packSize?.toString() || ''}
               onChangeText={value =>
-                handlePackagingInputChange('quantity', parseInt(value, 10))
+                handleProductInputChange('packSize', parseInt(value, 10))
               }
-              editable={!packaging?._id && !loading}
             />
           </View>
           <View style={styles.productInfo}>
@@ -194,7 +133,6 @@ const NewProductScreen = ({route, navigation}) => {
               style={{...styles.productInfoValue, ...styles.textInput}}
               value={product?.sku || ''}
               onChangeText={value => handleProductInputChange('sku', value)}
-              editable={!product?._id && !loading}
             />
           </View>
           <View style={styles.productInfo}>
@@ -222,7 +160,7 @@ const NewProductScreen = ({route, navigation}) => {
         </View>
       </ScrollView>
 
-      <Button label={'Cancel'} onPress={handleCancelPress} />
+      <Button label={'Scan'} onPress={handleScanPress} />
     </View>
   );
 };

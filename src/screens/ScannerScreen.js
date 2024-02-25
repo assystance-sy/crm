@@ -63,7 +63,7 @@ const ScannerScreen = ({route, navigation}) => {
   const onManualInputPress = code => {
     setBarcode('');
     setCameraOn(false);
-    navigation.push('New Product', {code});
+    navigation.push('Search', {code});
   };
 
   useEffect(() => {

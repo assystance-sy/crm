@@ -6,10 +6,11 @@ import StoresScreen from '../screens/StoresScreen';
 import NewOrderScreen from '../screens/NewOrderScreen';
 import StoreDetailsScreen from '../screens/StoreDetailsScreen';
 import ScannerScreen from '../screens/ScannerScreen';
-import ProductScreen from '../screens/ProductScreen';
+import ItemScreen from '../screens/ItemScreen';
 import OrdersScreen from '../screens/OrdersScreen';
 import OrderDetailsScreen from '../screens/OrderDetailsScreen';
 import NewProductScreen from '../screens/NewProductScreen';
+import SearchScreen from '../screens/SearchScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,9 +24,10 @@ function MainNavigation() {
         <Stack.Screen name="Orders" component={OrdersScreen} />
         <Stack.Screen name="Store Details" component={StoreDetailsScreen} />
         <Stack.Screen name="Scanner" component={ScannerScreen} />
-        <Stack.Screen name="Product" component={ProductScreen} />
+        <Stack.Screen name="Item" component={ItemScreen} />
         <Stack.Screen name="Order Details" component={OrderDetailsScreen} />
         <Stack.Screen name="New Product" component={NewProductScreen} />
+        <Stack.Screen name="Search" component={SearchScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

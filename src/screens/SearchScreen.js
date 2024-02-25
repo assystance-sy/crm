@@ -1,166 +1,93 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   StyleSheet,
   Text,
-  Alert,
   TextInput,
-  Image,
   ScrollView,
+  Image,
+  TouchableOpacity,
+  Alert,
 } from 'react-native';
 import Button from '../components/Button';
-import DataContext from '../services/DataContext';
-import axios from 'axios';
 import products from '../database/products.json';
 import images from '../assets/images';
 
-const NewProductScreen = ({route, navigation}) => {
-  const {sharedData} = useContext(DataContext);
-  const [product, setProduct] = useState({});
-  const [barcode, setBarcode] = useState('');
+const SearchScreen = ({route, navigation}) => {
   const [matchedProducts, setMatchedProducts] = useState([]);
+  const [barcode, setBarcode] = useState(route?.params?.code || '');
 
   const fetchProducts = () => {
+    if (barcode.length < 4) {
+      Alert.alert('Barcode too short', 'Please input at least 4 digits', [
+        {text: 'OK', onPress: () => {}},
+      ]);
+      return;
+    }
+
     const existingProducts = products.filter(p => p.barcode.includes(barcode));
-    if (existingProducts.length >= 1) {
-      setMatchedProducts(existingProducts);
-      setProduct(existingProducts[0]);
-    }
+    setMatchedProducts(existingProducts);
   };
 
-  const handleProductInputChange = (key, value) => {
-    setProduct(prevState => ({...prevState, [key]: value}));
-
-    if (key === 'barcode') {
-      setBarcode(value);
-    }
+  const handleProductPress = product => {
+    navigation.replace('Item', {product});
   };
 
-  const handleQuantityPress = async quantity => {
-    try {
-      if (!product?.packSize) {
-        Alert.alert('Empty Pack Size', 'Please input the pack size', [
-          {text: 'OK', onPress: () => {}},
-        ]);
-        return;
-      }
-
-      if (!product?.name) {
-        Alert.alert('Empty Product Name', 'Please input the product name', [
-          {text: 'OK', onPress: () => {}},
-        ]);
-        return;
-      }
-
-      if (!product?.sku) {
-        Alert.alert('Empty Product Code', 'Please input the product code', [
-          {text: 'OK', onPress: () => {}},
-        ]);
-        return;
-      }
-
-      if (!product?.barcode) {
-        Alert.alert(
-          'Empty Product Barcode',
-          'Please input the product barcode',
-          [{text: 'OK', onPress: () => {}}],
-        );
-        return;
-      }
-
-      // await createPurchaseOrderItem({
-      //   product: productId,
-      //   purchaseOrder: sharedData.purchaseOrderId,
-      //   packaging: packagingId,
-      //   quantity,
-      // });
-
-      navigation.goBack();
-    } catch (e) {
-      if (axios.isAxiosError(e)) {
-        Alert.alert(
-          'Failed to add item',
-          `Error message: ${e.response.data.error.message}`,
-          [{text: 'OK'}],
-        );
-      } else {
-        Alert.alert('Failed to add item', `Error message: ${e.message}`, [
-          {text: 'OK'},
-        ]);
-      }
-    }
+  const handleBackPress = () => {
+    navigation.goBack();
   };
-
-  const handleScanPress = () => {
-    setProduct({});
-    navigation.push('Scanner');
-  };
-
-  useEffect(() => {
-    if (route?.params?.code) {
-      handleProductInputChange('barcode', route.params.code);
-    }
-  }, []);
 
   return (
     <View style={styles.container}>
-      <ScrollView>
-        <View style={styles.productContainer}>
-          <Image source={images[product.image]} style={styles.productImage} />
-          <View style={styles.productInfo}>
-            <Text style={styles.productInfoLabel}>Product Name:</Text>
-            <TextInput
-              style={{...styles.productInfoValue, ...styles.textInput}}
-              value={product?.name || ''}
-              onChangeText={value => handleProductInputChange('name', value)}
-              multiline={true}
-            />
-          </View>
-          <View style={styles.productInfo}>
-            <Text style={styles.productInfoLabel}>Pack Size:</Text>
-            <TextInput
-              style={{...styles.productInfoValue, ...styles.textInput}}
-              keyboardType="numeric"
-              value={product?.packSize?.toString() || ''}
-              onChangeText={value =>
-                handleProductInputChange('packSize', parseInt(value, 10))
-              }
-            />
-          </View>
-          <View style={styles.productInfo}>
-            <Text style={styles.productInfoLabel}>Code:</Text>
-            <TextInput
-              style={{...styles.productInfoValue, ...styles.textInput}}
-              value={product?.sku || ''}
-              onChangeText={value => handleProductInputChange('sku', value)}
-            />
-          </View>
-          <View style={styles.productInfo}>
-            <Text style={styles.productInfoLabel}>Barcode:</Text>
-            <TextInput
-              style={{...styles.productInfoValue, ...styles.textInput}}
-              keyboardType="numeric"
-              value={product?.barcode || ''}
-              onChangeText={value => handleProductInputChange('barcode', value)}
-              onBlur={() => fetchProducts()}
-            />
-          </View>
-          <View style={styles.productInfo}>
-            <Text style={styles.productInfoLabel}>Quantity:</Text>
-            <View style={styles.quantityButtonGroup}>
-              {[1, 2, 3, 4, 5].map(number => (
-                <Button
-                  label={number.toString()}
-                  onPress={() => handleQuantityPress(number)}
-                  style={styles.quantityButton}
-                />
-              ))}
-            </View>
-          </View>
-        </View>
+      <View style={styles.productInfo}>
+        <Text style={styles.productInfoLabel}>Barcode:</Text>
+        <TextInput
+          style={{...styles.productInfoValue, ...styles.textInput}}
+          value={barcode}
+          onChangeText={value => setBarcode(value)}
+          onEndEditing={() => fetchProducts()}
+          keyboardType={'numeric'}
+        />
+      </View>
+
+      <ScrollView
+        contentContainerStyle={styles.productListContentContainer}
+        style={styles.productListContainer}>
+        {matchedProducts.map(product => {
+          return (
+            <TouchableOpacity
+              style={styles.productContainer}
+              key={product.sku}
+              onPress={handleProductPress}>
+              <Image
+                source={images[product.image]}
+                style={styles.productImage}
+              />
+              <View style={styles.productInfoContainer}>
+                <View style={styles.product}>
+                  <Text style={styles.productLabel}>Name:</Text>
+                  <Text style={styles.productValue}>{product?.name}</Text>
+                </View>
+                <View style={styles.product}>
+                  <Text style={styles.productLabel}>Code:</Text>
+                  <Text style={styles.productValue}>{product?.sku}</Text>
+                </View>
+                <View style={styles.product}>
+                  <Text style={styles.productLabel}>Barcode:</Text>
+                  <Text style={styles.productValue}>{product?.barcode}</Text>
+                </View>
+                <View style={styles.product}>
+                  <Text style={styles.productLabel}>Pack Size:</Text>
+                  <Text style={styles.productValue}>{product?.packSize}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+        {matchedProducts.length === 0 && <Text>No Product Found</Text>}
       </ScrollView>
 
-      <Button label={'Scan'} onPress={handleScanPress} />
+      <Button label={'Back'} onPress={handleBackPress} />
     </View>
   );
 };
@@ -173,41 +100,35 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   productImage: {
-    width: '50%',
+    width: 100,
     aspectRatio: '4/3',
     objectFit: 'contain',
     alignSelf: 'center',
   },
-  productInfo: {
+  product: {
     flexDirection: 'row',
-    flexGrow: 1,
   },
-  productInfoLabel: {
-    width: '30%',
+  productLabel: {
+    width: '35%',
     fontSize: 14,
     textTransform: 'uppercase',
     fontWeight: 'bold',
   },
-  productInfoValue: {
+  productValue: {
     flexGrow: 1,
     fontSize: 14,
     flex: 1,
   },
   productContainer: {
-    rowGap: 20,
-    marginVertical: 20,
-  },
-  quantityButton: {
-    width: 45,
-    aspectRatio: 1,
-    paddingHorizontal: 0,
-  },
-  quantityButtonGroup: {
+    borderWidth: 1,
+    borderColor: '#000000',
+    padding: 10,
+    marginBottom: 20,
     flexDirection: 'row',
-    gap: 20,
-    flexWrap: 'wrap',
-    flex: 1,
-    flexGrow: 1,
+  },
+  productListContentContainer: {},
+  productListContainer: {
+    marginTop: 20,
   },
   buttonGroup: {
     rowGap: 20,
@@ -215,6 +136,9 @@ const styles = StyleSheet.create({
   textInput: {
     borderWidth: 1,
   },
+  productInfoContainer: {
+    flex: 1,
+  },
 });
 
-export default NewProductScreen;
+export default SearchScreen;

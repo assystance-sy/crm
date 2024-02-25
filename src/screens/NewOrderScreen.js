@@ -37,15 +37,19 @@ const NewOrderScreen = () => {
     } else {
       await AsyncStorage.setItem(
         'orders',
-        JSON.parse(orders).concat([
-          {
-            orderNumber,
-            storeCode: selectedStore,
-            items: [],
-          },
-        ]),
+        JSON.stringify(
+          JSON.parse(orders).concat([
+            {
+              orderNumber,
+              storeCode: selectedStore,
+              items: [],
+            },
+          ]),
+        ),
       );
     }
+
+    updateSharedData({purchaseOrderNumber: orderNumber});
   };
 
   const handleCreatePress = async () => {
@@ -57,9 +61,7 @@ const NewOrderScreen = () => {
         return;
       }
 
-      const orderNumber = await createPurchaseOrder(selectedStore);
-
-      updateSharedData({purchaseOrderNumber: orderNumber});
+      await createPurchaseOrder(selectedStore);
 
       navigation.push('Scanner');
     } catch (error) {
