@@ -1,15 +1,19 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {View, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {DateTime} from 'luxon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DataContext from '../services/DataContext';
 
 const OrdersScreen = () => {
+  const {updateSharedData} = useContext(DataContext);
+  const isFocused = useIsFocused();
   const navigation = useNavigation();
   const [orders, setOrders] = useState([]);
 
   const handleOrderPress = order => {
-    navigation.navigate('Order Details', {order});
+    updateSharedData({purchaseOrderNumber: order.orderNumber});
+    navigation.navigate('Order Details');
   };
 
   const fetchOrders = async () => {
@@ -28,8 +32,7 @@ const OrdersScreen = () => {
 
   useEffect(() => {
     fetchOrders();
-  }, []);
-
+  }, [isFocused]);
   const renderOrderItem = ({item}) => {
     const {items = [], store = {}, orderNumber, createdAt} = item || {};
     return (
