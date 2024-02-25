@@ -1,113 +1,102 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {View, StyleSheet, Alert} from 'react-native';
-import {createPurchaseOrder} from '../services/apiServices/purchaseOrderApiService';
-import {getMerchants} from '../services/apiServices/merchantApiService';
-import {getStores} from '../services/apiServices/storeApiService';
 import {useNavigation} from '@react-navigation/native';
 import Picker from '../components/Picker';
 import Button from '../components/Button';
 import DataContext from '../services/DataContext';
+import merchants from '../database/merchants.json';
+import stores from '../database/stores.json';
+import {DateTime} from 'luxon';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NewOrderScreen = () => {
   const {updateSharedData} = useContext(DataContext);
   const navigation = useNavigation();
-  const [merchants, setMerchants] = useState([]);
-  const [stores, setStores] = useState([]);
-  const [selectedMerchantId, setSelectedMerchantId] = useState(null);
-  const [selectedStoreId, setSelectedStoreId] = useState(null);
+  const [selectedMerchant, setSelectedMerchant] = useState(null);
+  const [selectedStore, setSelectedStore] = useState(null);
 
-  const fetchMerchants = async () => {
-    try {
-      const response = await getMerchants();
-      setMerchants(response.data);
-    } catch (error) {
-      console.error('Error fetching merchant:', error);
-      setMerchants([]);
+  const createPurchaseOrder = async () => {
+    const orders = await AsyncStorage.getItem('orders');
+    const orderCount = orders === null ? 0 : JSON.parse(orders).length;
+    const currentDate = DateTime.local().toFormat('yyyyMMdd');
+    const orderNumber = `PO${currentDate}${orderCount
+      .toString()
+      .padStart(3, '0')}`;
+
+    if (orders === null) {
+      await AsyncStorage.setItem(
+        'orders',
+        JSON.stringify([
+          {
+            orderNumber,
+            storeCode: selectedStore,
+            items: [],
+          },
+        ]),
+      );
+    } else {
+      await AsyncStorage.setItem(
+        'orders',
+        JSON.parse(orders).concat([
+          {
+            orderNumber,
+            storeCode: selectedStore,
+            items: [],
+          },
+        ]),
+      );
     }
   };
 
-  const fetchStores = async (query = {}) => {
+  const handleCreatePress = async () => {
     try {
-      const response = await getStores({
-        page: 1,
-        limit: 99,
-        sort: 'code',
-        ...query,
-      });
-      setStores(response.data);
-    } catch (error) {
-      console.error('Error fetching store:', error);
-      setStores([]);
-    }
-  };
-
-  const handleNextPress = async () => {
-    try {
-      if (!selectedStoreId) {
+      if (!selectedStore) {
         Alert.alert('No store selected', 'Please select a store', [
           {text: 'OK', onPress: () => {}},
         ]);
         return;
       }
 
-      const merchantId = stores.find(
-        store => store._id === selectedStoreId,
-      ).merchant;
+      const orderNumber = await createPurchaseOrder(selectedStore);
 
-      const {data} = await createPurchaseOrder({
-        merchant: merchantId,
-        store: selectedStoreId,
-      });
+      updateSharedData({purchaseOrderNumber: orderNumber});
 
-      const {_id: purchaseOrderId, orderNumber} = data || {};
-
-      updateSharedData({
-        purchaseOrderId,
-        purchaseOrderNumber: orderNumber,
-        merchantId,
-        storeId: selectedStoreId,
-      });
-
-      navigation.navigate('Scanner');
+      navigation.push('Scanner');
     } catch (error) {
       console.error('Error creating purchase order:', error);
     }
   };
-
-  useEffect(() => {
-    fetchMerchants();
-    fetchStores();
-  }, []);
-
-  useEffect(() => {
-    fetchStores({merchant: selectedMerchantId});
-  }, [selectedMerchantId]);
 
   return (
     <View style={styles.container}>
       <View style={styles.pickerContainer}>
         <Picker
           label={'Merchant:'}
-          onValueChange={value => setSelectedMerchantId(value)}
+          onValueChange={value => setSelectedMerchant(value)}
           items={merchants.map(merchant => ({
             label: merchant?.name,
-            value: merchant?._id,
+            value: merchant?.name,
           }))}
           placeholder={{label: 'Select a merchant', value: null}}
         />
 
         <Picker
           label={'Store:'}
-          onValueChange={value => setSelectedStoreId(value)}
-          items={stores.map(store => ({
-            label: `${store?.name} - #${store?.code}`,
-            value: store?._id,
-          }))}
+          onValueChange={value => setSelectedStore(value)}
+          items={stores
+            .filter(store =>
+              selectedMerchant ? store.merchant === selectedMerchant : true,
+            )
+            .sort((a, b) => a.code - b.code)
+            .map(store => ({
+              label: `${store?.name} - #${store?.code}`,
+              value: store?.code,
+            }))}
           placeholder={{label: 'Select a store', value: null}}
         />
       </View>
 
-      <Button onPress={handleNextPress} label={'Next'} />
+      <Button onPress={handleCreatePress} label={'Create'} />
     </View>
   );
 };
@@ -123,7 +112,6 @@ const styles = StyleSheet.create({
   pickerContainer: {
     flex: 1,
     justifyContent: 'center',
-    rowGap: 50,
   },
 });
 
