@@ -5,9 +5,9 @@ import {
   useCameraDevice,
   useCodeScanner,
 } from 'react-native-vision-camera';
-import {getProducts} from '../services/apiServices/productApiService';
 import Button from '../components/Button';
 import DataContext from '../services/DataContext';
+import products from '../database/products.json';
 
 const ScannerScreen = ({route, navigation}) => {
   const {sharedData} = useContext(DataContext);
@@ -24,8 +24,7 @@ const ScannerScreen = ({route, navigation}) => {
 
   const fetchProduct = async code => {
     try {
-      const response = await getProducts({barcode: code});
-      const matchedProduct = response.data?.[0];
+      const matchedProduct = products.find(p => p.barcode === code);
 
       if (!matchedProduct) {
         Alert.alert(
@@ -43,7 +42,7 @@ const ScannerScreen = ({route, navigation}) => {
       setBarcode('');
       setCameraOn(false);
 
-      navigation.push('Product', {id: matchedProduct?._id});
+      navigation.push('Product', {product: matchedProduct});
     } catch (error) {
       console.error('Error fetching product:', error);
     }
@@ -56,12 +55,14 @@ const ScannerScreen = ({route, navigation}) => {
     }
   }, []);
 
-  const onScanPress = async () => {
-    await requestCameraPermission();
+  const onScanPress = () => {
+    setBarcode('');
     setCameraOn(true);
   };
 
-  const onManualInputPress = async code => {
+  const onManualInputPress = code => {
+    setBarcode('');
+    setCameraOn(false);
     navigation.push('New Product', {code});
   };
 
@@ -71,6 +72,10 @@ const ScannerScreen = ({route, navigation}) => {
       fetchProduct(barcode);
     }
   }, [barcode]);
+
+  useEffect(() => {
+    requestCameraPermission();
+  }, []);
 
   return (
     <View style={styles.container}>
