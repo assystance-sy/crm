@@ -6,8 +6,9 @@ import stores from '../database/stores.json';
 const StoreScreen = () => {
   const navigation = useNavigation();
 
-  const handleStorePress = id => {
-    navigation.navigate('Store Details', {id});
+  const handleStorePress = code => {
+    const store = stores.find(s => s.code === code);
+    navigation.navigate('Store Details', {store});
   };
 
   const renderStoreItem = ({item}) => {
@@ -73,7 +74,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f0f0f0',
     paddingHorizontal: 20,
-    paddingTop: 20,
     justifyContent: 'space-between',
   },
   storeList: {
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   storeItem: {
-    paddingVertical: 20,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#cccccc',
   },

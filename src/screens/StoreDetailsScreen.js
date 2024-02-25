@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,10 @@ import {
   Platform,
   Linking,
 } from 'react-native';
-import {getStore} from '../services/apiServices/storeApiService';
 
 const StoreDetailsScreen = ({route, navigation}) => {
-  const {id} = route.params;
-  const [store, setStore] = useState({});
-  const {merchant, address, code, staff = [], remark, location} = store || {};
+  const {store} = route.params;
+  const {merchant, address, code, staffs = [], remark, location} = store || {};
   const {street, city, province, postalCode} = address || {};
   const {coordinates} = location || {};
   const [lng, lat] = coordinates || [];
@@ -23,7 +21,7 @@ const StoreDetailsScreen = ({route, navigation}) => {
       android: 'geo:0,0?q=',
     });
     const latLng = `${lat},${lng}`;
-    const label = merchant?.name;
+    const label = merchant;
     const url = Platform.select({
       ios: `${scheme}${label}@${latLng}`,
       android: `${scheme}${latLng}(${label})`,
@@ -36,28 +34,12 @@ const StoreDetailsScreen = ({route, navigation}) => {
     Linking.openURL(`tel:${phoneNumber}`);
   };
 
-  const fetchStore = async () => {
-    try {
-      const response = await getStore(id, {
-        populate: ['merchant', 'address.city', 'address.province', 'staff'],
-      });
-      setStore(response.data);
-    } catch (error) {
-      console.error('Error fetching store:', error);
-      setStore({});
-    }
-  };
-
-  useEffect(() => {
-    fetchStore();
-  }, []);
-
   return (
     <View style={styles.container}>
       <View style={styles.store}>
         <View style={styles.storeItem}>
           <Text style={styles.storeItemLabel}>Merchant:</Text>
-          <Text style={styles.storeItemValue}>{merchant?.name}</Text>
+          <Text style={styles.storeItemValue}>{merchant}</Text>
         </View>
         <View style={styles.storeItem}>
           <Text style={styles.storeItemLabel}>Store ID:</Text>
@@ -67,11 +49,11 @@ const StoreDetailsScreen = ({route, navigation}) => {
           <Text style={styles.storeItemLabel}>Address:</Text>
           <TouchableOpacity onPress={handleAddressPress} style={{flex: 1}}>
             <Text style={{...styles.storeItemValue, flex: 0}}>
-              {`${street}, ${city?.name}, ${province?.abbreviation}, ${postalCode}`}
+              {`${street}, ${city}, ${province}, ${postalCode}`}
             </Text>
           </TouchableOpacity>
         </View>
-        {staff.map(storeStaff => {
+        {staffs.map(storeStaff => {
           return (
             <>
               <View style={styles.storeItem}>
@@ -84,8 +66,9 @@ const StoreDetailsScreen = ({route, navigation}) => {
                 <Text style={styles.storeItemLabel}>Phone:</Text>
                 {storeStaff.phones?.map(phone => (
                   <TouchableOpacity
-                    onPress={() => handlePhoneNumberPress(phone?.number)}>
-                    <Text style={styles.storeItemValue}>{phone?.number}</Text>
+                    style={{flex: 1}}
+                    onPress={() => handlePhoneNumberPress(phone)}>
+                    <Text style={styles.storeItemValue}>{phone}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -117,7 +100,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   storeItemLabel: {
-    width: '35%',
+    width: '25%',
     fontSize: 14,
     textTransform: 'uppercase',
     fontWeight: 'bold',
@@ -129,7 +112,7 @@ const styles = StyleSheet.create({
   },
   store: {
     paddingVertical: 10,
-    rowGap: 30,
+    rowGap: 10,
   },
 });
 
