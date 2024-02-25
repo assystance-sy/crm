@@ -29,8 +29,9 @@ const NewOrderScreen = () => {
         JSON.stringify([
           {
             orderNumber,
-            storeCode: selectedStore,
+            store: selectedStore,
             items: [],
+            createdAt: DateTime.now(),
           },
         ]),
       );
@@ -41,8 +42,9 @@ const NewOrderScreen = () => {
           JSON.parse(orders).concat([
             {
               orderNumber,
-              storeCode: selectedStore,
+              store: selectedStore,
               items: [],
+              createdAt: DateTime.now(),
             },
           ]),
         ),
@@ -92,7 +94,7 @@ const NewOrderScreen = () => {
             .sort((a, b) => a.code - b.code)
             .map(store => ({
               label: `${store?.name} - #${store?.code}`,
-              value: store?.code,
+              value: store,
             }))}
           placeholder={{label: 'Select a store', value: null}}
         />
