@@ -32,7 +32,7 @@ const ScannerScreen = ({route, navigation}) => {
           `No product matches with barcode ${code}`,
           [
             {text: 'Try again', onPress: onScanPress},
-            {text: 'Manual Input', onPress: () => onManualInputPress(code)},
+            {text: 'Manual Input', onPress: onManualInputPress},
           ],
         );
 
@@ -42,7 +42,7 @@ const ScannerScreen = ({route, navigation}) => {
       setBarcode('');
       setCameraOn(false);
 
-      navigation.push('Product', {product: matchedProduct});
+      navigation.push('Item', {product: matchedProduct});
     } catch (error) {
       console.error('Error fetching product:', error);
     }
@@ -60,10 +60,14 @@ const ScannerScreen = ({route, navigation}) => {
     setCameraOn(true);
   };
 
-  const onManualInputPress = code => {
+  const onManualInputPress = () => {
     setBarcode('');
     setCameraOn(false);
-    navigation.push('Search', {code});
+    navigation.push('Search');
+  };
+
+  const onDonePress = () => {
+    navigation.navigate('Home');
   };
 
   useEffect(() => {
@@ -98,6 +102,7 @@ const ScannerScreen = ({route, navigation}) => {
       <View style={styles.buttonGroup}>
         <Button label={'Scan'} onPress={onScanPress} />
         <Button label={'Manual Input'} onPress={onManualInputPress} />
+        <Button label={'Done'} onPress={onDonePress} />
       </View>
     </View>
   );
@@ -118,7 +123,7 @@ const styles = StyleSheet.create({
   },
   buttonGroup: {
     flexDirection: 'column',
-    gap: 20,
+    gap: 10,
   },
   orderInfo: {
     textTransform: 'uppercase',

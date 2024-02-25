@@ -15,7 +15,7 @@ import images from '../assets/images';
 
 const SearchScreen = ({route, navigation}) => {
   const [matchedProducts, setMatchedProducts] = useState([]);
-  const [barcode, setBarcode] = useState(route?.params?.code || '');
+  const [barcode, setBarcode] = useState('');
 
   const fetchProducts = () => {
     if (barcode.length < 4) {
@@ -30,7 +30,7 @@ const SearchScreen = ({route, navigation}) => {
   };
 
   const handleProductPress = product => {
-    navigation.replace('Item', {product});
+    navigation.push('Item', {product});
   };
 
   const handleBackPress = () => {
@@ -58,7 +58,7 @@ const SearchScreen = ({route, navigation}) => {
             <TouchableOpacity
               style={styles.productContainer}
               key={product.sku}
-              onPress={handleProductPress}>
+              onPress={() => handleProductPress(product)}>
               <Image
                 source={images[product.image]}
                 style={styles.productImage}
@@ -84,7 +84,9 @@ const SearchScreen = ({route, navigation}) => {
             </TouchableOpacity>
           );
         })}
-        {matchedProducts.length === 0 && <Text>No Product Found</Text>}
+        {matchedProducts.length === 0 && (
+          <Text style={styles.noProduct}>No Product Found</Text>
+        )}
       </ScrollView>
 
       <Button label={'Back'} onPress={handleBackPress} />
@@ -138,6 +140,9 @@ const styles = StyleSheet.create({
   },
   productInfoContainer: {
     flex: 1,
+  },
+  noProduct: {
+    textAlign: 'center',
   },
 });
 
