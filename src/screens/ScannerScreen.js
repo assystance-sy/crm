@@ -3,6 +3,7 @@ import {View, StyleSheet, Linking, Alert, Text} from 'react-native';
 import {
   Camera,
   useCameraDevice,
+  useCameraPermission,
   useCodeScanner,
 } from 'react-native-vision-camera';
 import Button from '../components/Button';
@@ -11,6 +12,7 @@ import products from '../database/products.json';
 
 const ScannerScreen = ({route, navigation}) => {
   const {sharedData} = useContext(DataContext);
+  const {hasPermission} = useCameraPermission();
   const device = useCameraDevice('back');
   const [cameraOn, setCameraOn] = useState(false);
   const [barcode, setBarcode] = useState('');
@@ -48,13 +50,6 @@ const ScannerScreen = ({route, navigation}) => {
     }
   };
 
-  const requestCameraPermission = useCallback(async () => {
-    const permission = await Camera.requestCameraPermission();
-    if (permission === 'denied') {
-      await Linking.openSettings();
-    }
-  }, []);
-
   const onScanPress = () => {
     setBarcode('');
     setCameraOn(true);
@@ -77,10 +72,6 @@ const ScannerScreen = ({route, navigation}) => {
     }
   }, [barcode]);
 
-  useEffect(() => {
-    requestCameraPermission();
-  }, []);
-
   return (
     <View style={styles.container}>
       <View>
@@ -93,7 +84,7 @@ const ScannerScreen = ({route, navigation}) => {
           <Camera
             style={styles.camera}
             device={device}
-            isActive={cameraOn}
+            isActive={cameraOn && hasPermission}
             codeScanner={codeScanner}
           />
         )}
