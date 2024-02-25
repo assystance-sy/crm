@@ -40,7 +40,7 @@ const SearchScreen = ({route, navigation}) => {
   return (
     <View style={styles.container}>
       <View>
-        <Text style={styles.productInfoLabel}>Barcode:</Text>
+        <Text style={styles.productLabel}>Barcode:</Text>
         <TextInput
           style={styles.textInput}
           value={barcode}
@@ -103,6 +103,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     borderWidth: 1,
+    color: '#000000',
   },
   productImage: {
     width: 100,
@@ -118,11 +119,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textTransform: 'uppercase',
     fontWeight: 'bold',
+    color: '#000000',
   },
   productValue: {
     flexGrow: 1,
     fontSize: 14,
     flex: 1,
+    color: '#000000',
   },
   productContainer: {
     borderWidth: 1,
@@ -140,6 +143,7 @@ const styles = StyleSheet.create({
   },
   noProduct: {
     textAlign: 'center',
+    color: '#000000',
   },
 });
 

@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     fontSize: 18,
     marginBottom: 40,
+    color: '#000000',
   },
 });
 

@@ -89,11 +89,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     textTransform: 'uppercase',
+    color: '#000000',
   },
   storeListItemValue: {
     flexGrow: 1,
     fontSize: 14,
     flex: 1,
+    color: '#000000',
   },
   storeItem: {
     paddingVertical: 10,

@@ -13,6 +13,11 @@ const Picker = props => {
           onValueChange={onValueChange}
           items={items}
           placeholder={placeholder}
+          style={{
+            inputAndroid: {
+              color: 'black',
+            },
+          }}
         />
       </View>
     </View>
@@ -27,6 +32,7 @@ const styles = StyleSheet.create({
   pickerLabel: {
     fontSize: 14,
     textTransform: 'uppercase',
+    color: '#000000',
   },
 });
 

@@ -120,11 +120,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textTransform: 'uppercase',
     fontWeight: 'bold',
+    color: '#000000',
   },
   productInfoValue: {
     flexGrow: 1,
     fontSize: 14,
     flex: 1,
+    color: '#000000',
   },
   productContainer: {},
   quantityButton: {
