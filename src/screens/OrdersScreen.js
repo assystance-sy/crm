@@ -17,7 +17,12 @@ const OrdersScreen = () => {
     if (data === null) {
       setOrders([]);
     } else {
-      setOrders(JSON.parse(data).sort((a, b) => b.createdAt - a.createdAt));
+      setOrders(
+        JSON.parse(data).sort(
+          (a, b) =>
+            DateTime.fromISO(b.createdAt) - DateTime.fromISO(a.createdAt),
+        ),
+      );
     }
   };
 
@@ -26,11 +31,11 @@ const OrdersScreen = () => {
   }, []);
 
   const renderOrderItem = ({item}) => {
-    const {items = [], store, orderNumber, _id, createdAt} = item;
+    const {items = [], store = {}, orderNumber, createdAt} = item || {};
     return (
       <TouchableOpacity
         style={styles.orderItem}
-        onPress={() => handleOrderPress(_id)}>
+        onPress={() => handleOrderPress(item)}>
         <View style={styles.orderListItem}>
           <Text style={styles.orderListItemLabel}>Order Number:</Text>
           <Text style={styles.orderListItemValue}>{orderNumber}</Text>
