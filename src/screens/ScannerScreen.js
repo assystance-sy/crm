@@ -19,8 +19,13 @@ const ScannerScreen = ({route, navigation}) => {
   const codeScanner = useCodeScanner({
     codeTypes: ['code-128', 'ean-13'],
     onCodeScanned: async codes => {
-      const code = codes[0].value;
-      setBarcode(code);
+      if (cameraOn) {
+        const code = codes[0].value;
+        if (code) {
+          setBarcode(code);
+          setCameraOn(false);
+        }
+      }
     },
   });
 
@@ -42,7 +47,6 @@ const ScannerScreen = ({route, navigation}) => {
       }
 
       setBarcode('');
-      setCameraOn(false);
 
       navigation.push('Item', {product: matchedProduct});
     } catch (error) {
@@ -66,8 +70,7 @@ const ScannerScreen = ({route, navigation}) => {
   };
 
   useEffect(() => {
-    if (barcode) {
-      setCameraOn(false);
+    if (barcode && !cameraOn) {
       fetchProduct(barcode);
     }
   }, [barcode]);
