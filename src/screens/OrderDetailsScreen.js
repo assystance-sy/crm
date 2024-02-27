@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
   Alert,
   FlatList,
 } from 'react-native';
@@ -14,6 +13,7 @@ import DataContext from '../services/DataContext';
 import images from '../assets/images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useIsFocused} from '@react-navigation/native';
+import FastImage from 'react-native-fast-image';
 
 const OrderDetailsScreen = ({route, navigation}) => {
   const {sharedData} = useContext(DataContext);
@@ -116,7 +116,11 @@ const OrderDetailsScreen = ({route, navigation}) => {
       <TouchableOpacity
         style={styles.productContainer}
         onPress={() => handleOrderItemPress(item)}>
-        <Image source={images[image]} style={styles.productImage} />
+        <FastImage
+          source={images[image]}
+          style={styles.productImage}
+          resizeMode={FastImage.resizeMode.contain}
+        />
         <View style={styles.productInfoContainer}>
           <View style={styles.product}>
             <Text style={styles.productLabel}>Name:</Text>
@@ -213,6 +217,7 @@ const OrderDetailsScreen = ({route, navigation}) => {
         renderItem={renderOrderItem}
         keyExtractor={item => item.key}
         contentContainerStyle={styles.productListContainer}
+        maxToRenderPerBatch={10}
       />
 
       <View style={styles.buttonGroup}>
@@ -278,13 +283,14 @@ const styles = StyleSheet.create({
   productContainer: {
     borderWidth: 1,
     borderColor: '#000000',
-    padding: 10,
-    marginBottom: 20,
+    padding: 5,
+    marginBottom: 10,
     flexDirection: 'row',
+    columnGap: 10,
   },
   productListContentContainer: {},
   productListContainer: {
-    marginTop: 20,
+    paddingVertical: 20,
   },
   productInfoContainer: {
     flex: 1,
