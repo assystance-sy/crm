@@ -1,10 +1,11 @@
 import React, {useContext} from 'react';
-import {View, StyleSheet, Text, Image, Alert} from 'react-native';
+import {View, StyleSheet, Text, Alert} from 'react-native';
 import Button from '../components/Button';
 import DataContext from '../services/DataContext';
 import images from '../assets/images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {DateTime} from 'luxon';
+import FastImage from 'react-native-fast-image';
 
 const ItemScreen = ({route, navigation}) => {
   const {sharedData} = useContext(DataContext);
@@ -68,7 +69,11 @@ const ItemScreen = ({route, navigation}) => {
   return (
     <View style={styles.container}>
       <View style={styles.productContainer}>
-        <Image source={images[product.image]} style={styles.productImage} />
+        <FastImage
+          source={images[product.image]}
+          style={styles.productImage}
+          resizeMode={FastImage.resizeMode.contain}
+        />
         <View style={styles.productInfo}>
           <Text style={styles.productInfoLabel}>Product Name:</Text>
           <Text style={styles.productInfoValue}>{product?.name}</Text>
