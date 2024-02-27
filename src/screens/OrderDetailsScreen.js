@@ -3,10 +3,10 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   Image,
   Alert,
+  FlatList,
 } from 'react-native';
 import {DateTime} from 'luxon';
 import Button from '../components/Button';
@@ -18,6 +18,7 @@ import {useIsFocused} from '@react-navigation/native';
 const OrderDetailsScreen = ({route, navigation}) => {
   const {sharedData} = useContext(DataContext);
   const [order, setOrder] = useState({});
+  const [items, setItems] = useState([]);
   const isFocused = useIsFocused();
 
   const fetchOrder = async () => {
@@ -44,6 +45,7 @@ const OrderDetailsScreen = ({route, navigation}) => {
       }
 
       setOrder(orders[index]);
+      setItems(orders[index]?.items);
     } catch (e) {
       Alert.alert('Failed to remove item', `Error message: ${e.message}`, [
         {text: 'OK'},
@@ -100,6 +102,57 @@ const OrderDetailsScreen = ({route, navigation}) => {
     navigation.navigate('Scanner');
   };
 
+  const handleSortingPress = sortBy => {
+    const newList = items
+      .sort((a, b) => a[sortBy].localeCompare(b[sortBy]))
+      .map((p, index) => ({...p, key: index}));
+    setItems(newList);
+  };
+
+  const renderOrderItem = ({item}) => {
+    const {image, name, sku, barcode, packSize, quantity, createdAt, brand} =
+      item || {};
+    return (
+      <TouchableOpacity
+        style={styles.productContainer}
+        onPress={() => handleOrderItemPress(item)}>
+        <Image source={images[image]} style={styles.productImage} />
+        <View style={styles.productInfoContainer}>
+          <View style={styles.product}>
+            <Text style={styles.productLabel}>Name:</Text>
+            <Text style={styles.productValue}>{name}</Text>
+          </View>
+          <View style={styles.product}>
+            <Text style={styles.productLabel}>Brand:</Text>
+            <Text style={styles.productValue}>{brand}</Text>
+          </View>
+          <View style={styles.product}>
+            <Text style={styles.productLabel}>Code:</Text>
+            <Text style={styles.productValue}>{sku}</Text>
+          </View>
+          <View style={styles.product}>
+            <Text style={styles.productLabel}>Barcode:</Text>
+            <Text style={styles.productValue}>{barcode}</Text>
+          </View>
+          <View style={styles.product}>
+            <Text style={styles.productLabel}>Pack Size:</Text>
+            <Text style={styles.productValue}>{packSize}</Text>
+          </View>
+          <View style={styles.product}>
+            <Text style={styles.productLabel}>Quantity:</Text>
+            <Text style={styles.productValue}>{quantity}</Text>
+          </View>
+          <View style={styles.product}>
+            <Text style={styles.productLabel}>Created At:</Text>
+            <Text style={styles.productValue}>
+              {DateTime.fromISO(createdAt).toFormat('dd/MM/yyyy HH:mm')}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   useEffect(() => {
     fetchOrder();
   }, [isFocused]);
@@ -131,49 +184,36 @@ const OrderDetailsScreen = ({route, navigation}) => {
         <Text style={styles.orderItemLabel}>No. of Items:</Text>
         <Text style={styles.orderItemValue}>{(order?.items || []).length}</Text>
       </View>
+      <View style={styles.orderItem}>
+        <Text style={styles.orderItemLabel}>Sort By:</Text>
+        <View style={styles.sortingButtonGroup}>
+          <Button
+            label={'Created At'}
+            style={styles.sortingButton}
+            buttonTextStyle={{fontSize: 14}}
+            onPress={() => handleSortingPress('createdAt')}
+          />
+          <Button
+            label={'Brand'}
+            style={styles.sortingButton}
+            buttonTextStyle={{fontSize: 14}}
+            onPress={() => handleSortingPress('brand')}
+          />
+          <Button
+            label={'Code'}
+            style={styles.sortingButton}
+            buttonTextStyle={{fontSize: 14}}
+            onPress={() => handleSortingPress('sku')}
+          />
+        </View>
+      </View>
 
-      <ScrollView
-        contentContainerStyle={styles.productListContentContainer}
-        style={styles.productListContainer}>
-        {(order?.items || []).map(product => {
-          return (
-            <TouchableOpacity
-              style={styles.productContainer}
-              key={product.sku}
-              onPress={() => handleOrderItemPress(product)}>
-              <Image
-                source={images[product.image]}
-                style={styles.productImage}
-              />
-              <View style={styles.productInfoContainer}>
-                <View style={styles.product}>
-                  <Text style={styles.productLabel}>Name:</Text>
-                  <Text style={styles.productValue}>{product?.name}</Text>
-                </View>
-                <View style={styles.product}>
-                  <Text style={styles.productLabel}>Code:</Text>
-                  <Text style={styles.productValue}>{product?.sku}</Text>
-                </View>
-                <View style={styles.product}>
-                  <Text style={styles.productLabel}>Barcode:</Text>
-                  <Text style={styles.productValue}>{product?.barcode}</Text>
-                </View>
-                <View style={styles.product}>
-                  <Text style={styles.productLabel}>Pack Size:</Text>
-                  <Text style={styles.productValue}>{product?.packSize}</Text>
-                </View>
-                <View style={styles.product}>
-                  <Text style={styles.productLabel}>Quantity:</Text>
-                  <Text style={styles.productValue}>{product?.quantity}</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-        {(order?.items || []).length === 0 && (
-          <Text style={styles.noProduct}>No Item Found</Text>
-        )}
-      </ScrollView>
+      <FlatList
+        data={items}
+        renderItem={renderOrderItem}
+        keyExtractor={item => item.key}
+        contentContainerStyle={styles.productListContainer}
+      />
 
       <View style={styles.buttonGroup}>
         <Button
@@ -261,6 +301,15 @@ const styles = StyleSheet.create({
   button: {
     width: '45%',
     paddingHorizontal: 0,
+  },
+  sortingButtonGroup: {
+    flexDirection: 'row',
+    columnGap: 5,
+  },
+  sortingButton: {
+    paddingHorizontal: 10,
+    width: 'fit-content',
+    paddingVertical: 5,
   },
 });
 

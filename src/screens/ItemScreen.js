@@ -4,6 +4,7 @@ import Button from '../components/Button';
 import DataContext from '../services/DataContext';
 import images from '../assets/images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {DateTime} from 'luxon';
 
 const ItemScreen = ({route, navigation}) => {
   const {sharedData} = useContext(DataContext);
@@ -33,7 +34,11 @@ const ItemScreen = ({route, navigation}) => {
       }
 
       const order = orders[index];
-      order.items.push({...product, quantity});
+      order.items.push({
+        ...product,
+        quantity,
+        createdAt: DateTime.now(),
+      });
       orders[index] = order;
       await AsyncStorage.setItem('orders', JSON.stringify(orders));
 

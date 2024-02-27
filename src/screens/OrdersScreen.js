@@ -33,6 +33,7 @@ const OrdersScreen = () => {
   useEffect(() => {
     fetchOrders();
   }, [isFocused]);
+
   const renderOrderItem = ({item}) => {
     const {items = [], store = {}, orderNumber, createdAt} = item || {};
     return (
