@@ -284,13 +284,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#000000',
     padding: 5,
-    marginBottom: 10,
     flexDirection: 'row',
     columnGap: 10,
   },
   productListContentContainer: {},
   productListContainer: {
     paddingVertical: 20,
+    rowGap: 10,
   },
   productInfoContainer: {
     flex: 1,
