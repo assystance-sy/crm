@@ -34,11 +34,18 @@ const ItemScreen = ({route, navigation}) => {
       }
 
       const order = orders[index];
-      order.items.push({
-        ...product,
-        quantity,
-        createdAt: DateTime.now(),
-      });
+      const itemIndex = order.items.findIndex(
+        ({barcode}) => barcode === product.barcode,
+      );
+      if (itemIndex !== -1) {
+        order.items[itemIndex].quantity = quantity;
+      } else {
+        order.items.push({
+          ...product,
+          quantity,
+          createdAt: DateTime.now(),
+        });
+      }
       orders[index] = order;
       await AsyncStorage.setItem('orders', JSON.stringify(orders));
 
