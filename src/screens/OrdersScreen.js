@@ -1,5 +1,11 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {View, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
+import {
+  SectionList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {DateTime} from 'luxon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,17 +22,36 @@ const OrdersScreen = () => {
     navigation.navigate('Order Details');
   };
 
+  function convertToSectionListFormat(data) {
+    // Grouping the data by createdAt
+    const groupedData = data.reduce((acc, item) => {
+      const createdAtDate = new Date(item.createdAt).toLocaleDateString();
+      if (!acc[createdAtDate]) {
+        acc[createdAtDate] = [];
+      }
+      acc[createdAtDate].push(item);
+      return acc;
+    }, {});
+
+    // Converting the grouped data into the format expected by SectionList
+    return Object.keys(groupedData).map(date => ({
+      title: date,
+      data: groupedData[date],
+    }));
+  }
+
   const fetchOrders = async () => {
     const data = await AsyncStorage.getItem('orders');
     if (data === null) {
       setOrders([]);
     } else {
-      setOrders(
+      const parsedData = convertToSectionListFormat(
         JSON.parse(data).sort(
           (a, b) =>
             DateTime.fromISO(b.createdAt) - DateTime.fromISO(a.createdAt),
         ),
       );
+      setOrders(parsedData);
     }
   };
 
@@ -71,11 +96,13 @@ const OrdersScreen = () => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={orders}
+      <SectionList
+        sections={orders}
+        keyExtractor={item => item.date}
         renderItem={renderOrderItem}
-        keyExtractor={item => item.orderNumber}
-        contentContainerStyle={styles.orderList}
+        renderSectionHeader={({section: {title}}) => (
+          <Text style={styles.sectionTitle}>{title}</Text>
+        )}
       />
     </View>
   );
@@ -94,7 +121,6 @@ const styles = StyleSheet.create({
   },
   orderListItem: {
     flexDirection: 'row',
-    paddingVertical: 5,
   },
   orderListItemLabel: {
     width: '35%',
@@ -113,6 +139,10 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#cccccc',
+  },
+  sectionTitle: {
+    marginTop: 20,
+    color: '#000000',
   },
 });
 
