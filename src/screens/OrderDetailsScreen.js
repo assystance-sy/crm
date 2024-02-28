@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   Alert,
   FlatList,
+  ToastAndroid,
+  PermissionsAndroid,
 } from 'react-native';
 import {DateTime} from 'luxon';
 import Button from '../components/Button';
@@ -14,6 +16,7 @@ import images from '../assets/images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useIsFocused} from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
+import {Dirs, FileSystem} from 'react-native-file-access';
 
 const OrderDetailsScreen = ({route, navigation}) => {
   const {sharedData} = useContext(DataContext);
@@ -98,6 +101,66 @@ const OrderDetailsScreen = ({route, navigation}) => {
     navigation.push('Edit Item', {product});
   };
 
+  const handleExportPress = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'Require Permission For Writing To External Storage',
+          message:
+            'Need to access your external storage in order to export the order.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        const orderInfo = [];
+        orderInfo.push(['Order Number', order.orderNumber].join(','));
+        orderInfo.push(['Merchant', order.merchant].join(','));
+        orderInfo.push(
+          ['Store', `${order.store.name} - #${order.store.code}`].join(','),
+        );
+        orderInfo.push(
+          [
+            'Created At',
+            DateTime.fromISO(order.createdAt).toFormat('dd/MM/yyyy HH:mm'),
+          ].join(','),
+        );
+
+        const headers = [
+          'Name',
+          'Brand',
+          'Code',
+          'Barcode',
+          'Pack Size',
+          'Quantity',
+          '\n',
+        ].join(',');
+
+        const data = items
+          .map(item => {
+            const {name, brand, sku, barcode, packSize, quantity} = item;
+            return [name, brand, sku, barcode, packSize, quantity].join(',');
+          })
+          .join('\n');
+
+        const csv = `${orderInfo.join('\n')}\n\n${headers}${data}`;
+        const fileName = `${order.orderNumber}.csv`;
+        const filePath = `${Dirs.DocumentDir}/${fileName}`;
+
+        await FileSystem.writeFile(filePath, csv, 'utf8');
+
+        await FileSystem.cpExternal(filePath, fileName, 'downloads');
+
+        ToastAndroid.show(`Saved to /Download/${fileName}`, ToastAndroid.SHORT);
+      }
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
+
   const handleAddPress = () => {
     navigation.navigate('Scanner');
   };
@@ -115,6 +178,7 @@ const OrderDetailsScreen = ({route, navigation}) => {
     return (
       <TouchableOpacity
         style={styles.productContainer}
+        key={barcode}
         onPress={() => handleOrderItemPress(item)}>
         <FastImage
           source={images[image]}
@@ -215,7 +279,7 @@ const OrderDetailsScreen = ({route, navigation}) => {
       <FlatList
         data={items}
         renderItem={renderOrderItem}
-        keyExtractor={item => item.key}
+        keyExtractor={item => item.barcode}
         contentContainerStyle={styles.productListContainer}
         maxToRenderPerBatch={10}
       />
@@ -227,6 +291,11 @@ const OrderDetailsScreen = ({route, navigation}) => {
           style={styles.button}
         />
         <Button label={'Add'} onPress={handleAddPress} style={styles.button} />
+        <Button
+          label={'Export'}
+          onPress={handleExportPress}
+          style={styles.button}
+        />
       </View>
     </View>
   );
@@ -305,8 +374,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
   },
   button: {
-    width: '45%',
-    paddingHorizontal: 0,
+    width: '30%',
+    paddingHorizontal: 10,
   },
   sortingButtonGroup: {
     flexDirection: 'row',

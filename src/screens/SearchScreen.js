@@ -4,7 +4,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  Alert,
   TouchableOpacity,
   FlatList,
 } from 'react-native';
