@@ -141,8 +141,15 @@ const OrderDetailsScreen = ({route, navigation}) => {
 
         const data = items
           .map(item => {
-            const {name, brand, sku, barcode, packSize, quantity} = item;
-            return [name, brand, sku, barcode, packSize, quantity].join(',');
+            const {name, brand, sku, barcodes, packSizes, quantity} = item;
+            return [
+              name,
+              brand,
+              sku,
+              barcodes.join(','),
+              packSizes.join(','),
+              quantity,
+            ].join(',');
           })
           .join('\n');
 
@@ -173,12 +180,12 @@ const OrderDetailsScreen = ({route, navigation}) => {
   };
 
   const renderOrderItem = ({item}) => {
-    const {image, name, sku, barcode, packSize, quantity, createdAt, brand} =
+    const {image, name, sku, barcodes, packSizes, quantity, createdAt, brand} =
       item || {};
     return (
       <TouchableOpacity
         style={styles.productContainer}
-        key={barcode}
+        key={sku}
         onPress={() => handleOrderItemPress(item)}>
         <FastImage
           source={images[image]}
@@ -200,11 +207,11 @@ const OrderDetailsScreen = ({route, navigation}) => {
           </View>
           <View style={styles.product}>
             <Text style={styles.productLabel}>Barcode:</Text>
-            <Text style={styles.productValue}>{barcode}</Text>
+            <Text style={styles.productValue}>{barcodes.join(', ')}</Text>
           </View>
           <View style={styles.product}>
             <Text style={styles.productLabel}>Pack Size:</Text>
-            <Text style={styles.productValue}>{packSize}</Text>
+            <Text style={styles.productValue}>{packSizes.join(', ')}</Text>
           </View>
           <View style={styles.product}>
             <Text style={styles.productLabel}>Quantity:</Text>
@@ -279,7 +286,7 @@ const OrderDetailsScreen = ({route, navigation}) => {
       <FlatList
         data={items}
         renderItem={renderOrderItem}
-        keyExtractor={item => item.barcode}
+        keyExtractor={item => item.sku}
         contentContainerStyle={styles.productListContainer}
         maxToRenderPerBatch={10}
       />

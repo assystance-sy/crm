@@ -18,7 +18,9 @@ const SearchScreen = ({route, navigation}) => {
   const [name, setName] = useState('');
 
   const searchByBarcode = () => {
-    const existingProducts = products.filter(p => p.barcode.includes(barcode));
+    const existingProducts = products.filter(p =>
+      p.barcodes.some(b => b.includes(barcode)),
+    );
     setMatchedProducts(existingProducts);
     setBarcode('');
   };
@@ -42,7 +44,7 @@ const SearchScreen = ({route, navigation}) => {
   };
 
   const renderOrderItem = ({item}) => {
-    const {image, name, sku, barcode, packSize} = item || {};
+    const {image, name, sku, barcodes, packSizes} = item || {};
     return (
       <TouchableOpacity
         style={styles.productContainer}
@@ -63,11 +65,11 @@ const SearchScreen = ({route, navigation}) => {
           </View>
           <View style={styles.product}>
             <Text style={styles.productLabel}>Barcode:</Text>
-            <Text style={styles.productValue}>{barcode}</Text>
+            <Text style={styles.productValue}>{barcodes.join(', ')}</Text>
           </View>
           <View style={styles.product}>
             <Text style={styles.productLabel}>Pack Size:</Text>
-            <Text style={styles.productValue}>{packSize}</Text>
+            <Text style={styles.productValue}>{packSizes.join(', ')}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -76,37 +78,39 @@ const SearchScreen = ({route, navigation}) => {
 
   return (
     <View style={styles.container}>
-      <View>
-        <Text style={styles.productLabel}>Barcode:</Text>
-        <TextInput
-          style={styles.textInput}
-          value={barcode}
-          onTextInput={() => setName('')}
-          onChangeText={value => setBarcode(value)}
-          onEndEditing={() => searchByBarcode()}
-          keyboardType={'numeric'}
-        />
-      </View>
+      <View style={styles.upperContainer}>
+        <View>
+          <Text style={styles.productLabel}>Barcode:</Text>
+          <TextInput
+            style={styles.textInput}
+            value={barcode}
+            onTextInput={() => setName('')}
+            onChangeText={value => setBarcode(value)}
+            onEndEditing={() => searchByBarcode()}
+            keyboardType={'numeric'}
+          />
+        </View>
 
-      <View>
-        <Text style={styles.productLabel}>Name:</Text>
-        <TextInput
-          style={styles.textInput}
-          value={name}
-          onTextInput={() => setBarcode('')}
-          onChangeText={value => setName(value)}
-          onEndEditing={() => searchByName()}
-        />
-      </View>
+        <View>
+          <Text style={styles.productLabel}>Name:</Text>
+          <TextInput
+            style={styles.textInput}
+            value={name}
+            onTextInput={() => setBarcode('')}
+            onChangeText={value => setName(value)}
+            onEndEditing={() => searchByName()}
+          />
+        </View>
 
-      <View>
-        <Text style={styles.productLabel}>Products:</Text>
-        <FlatList
-          data={matchedProducts}
-          renderItem={renderOrderItem}
-          keyExtractor={item => item.key}
-          contentContainerStyle={styles.productListContainer}
-        />
+        <View>
+          <Text style={styles.productLabel}>Products:</Text>
+          <FlatList
+            data={matchedProducts}
+            renderItem={renderOrderItem}
+            keyExtractor={item => item.key}
+            contentContainerStyle={styles.productListContainer}
+          />
+        </View>
       </View>
 
       <Button label={'Back'} onPress={handleBackPress} />
@@ -120,7 +124,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
     padding: 20,
     justifyContent: 'space-between',
-    rowGap: 10,
   },
   textInput: {
     borderWidth: 1,
@@ -166,6 +169,9 @@ const styles = StyleSheet.create({
   noProduct: {
     textAlign: 'center',
     color: '#000000',
+  },
+  upperContainer: {
+    rowGap: 10,
   },
 });
 

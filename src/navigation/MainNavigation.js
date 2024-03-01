@@ -9,7 +9,6 @@ import ScannerScreen from '../screens/ScannerScreen';
 import ItemScreen from '../screens/ItemScreen';
 import OrdersScreen from '../screens/OrdersScreen';
 import OrderDetailsScreen from '../screens/OrderDetailsScreen';
-import NewProductScreen from '../screens/NewProductScreen';
 import SearchScreen from '../screens/SearchScreen';
 import EditItemScreen from '../screens/EditItemScreen';
 
@@ -27,7 +26,6 @@ function MainNavigation() {
         <Stack.Screen name="Scanner" component={ScannerScreen} />
         <Stack.Screen name="Item" component={ItemScreen} />
         <Stack.Screen name="Order Details" component={OrderDetailsScreen} />
-        <Stack.Screen name="New Product" component={NewProductScreen} />
         <Stack.Screen name="Search" component={SearchScreen} />
         <Stack.Screen name="Edit Item" component={EditItemScreen} />
       </Stack.Navigator>

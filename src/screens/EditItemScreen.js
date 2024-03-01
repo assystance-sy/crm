@@ -105,7 +105,7 @@ const EditItemScreen = ({route, navigation}) => {
         <View style={styles.productInfo}>
           <Text style={styles.productInfoLabel}>Pack Size:</Text>
           <Text style={styles.productInfoValue}>
-            {product?.packSize || 'N/A'}
+            {product?.packSizes.join(', ')}
           </Text>
         </View>
         <View style={styles.productInfo}>
@@ -114,7 +114,9 @@ const EditItemScreen = ({route, navigation}) => {
         </View>
         <View style={styles.productInfo}>
           <Text style={styles.productInfoLabel}>Barcode:</Text>
-          <Text style={styles.productInfoValue}>{product?.barcode}</Text>
+          <Text style={styles.productInfoValue}>
+            {product?.barcodes.join(', ')}
+          </Text>
         </View>
         <View style={styles.productInfo}>
           <Text style={styles.productInfoLabel}>Quantity:</Text>

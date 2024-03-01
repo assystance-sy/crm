@@ -17,6 +17,7 @@ const StoreScreen = () => {
     return (
       <TouchableOpacity
         style={styles.storeItem}
+        key={code}
         onPress={() => handleStorePress(code)}>
         <View style={styles.storeListItem}>
           <Text style={styles.storeListItemLabel}>Merchant:</Text>

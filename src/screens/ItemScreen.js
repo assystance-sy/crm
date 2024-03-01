@@ -35,9 +35,7 @@ const ItemScreen = ({route, navigation}) => {
       }
 
       const order = orders[index];
-      const itemIndex = order.items.findIndex(
-        ({barcode}) => barcode === product.barcode,
-      );
+      const itemIndex = order.items.findIndex(({sku}) => sku === product.sku);
       if (itemIndex !== -1) {
         order.items[itemIndex].quantity = quantity;
       } else {
@@ -81,7 +79,7 @@ const ItemScreen = ({route, navigation}) => {
         <View style={styles.productInfo}>
           <Text style={styles.productInfoLabel}>Pack Size:</Text>
           <Text style={styles.productInfoValue}>
-            {product?.packSize || 'N/A'}
+            {product?.packSizes.join(', ')}
           </Text>
         </View>
         <View style={styles.productInfo}>
@@ -90,7 +88,9 @@ const ItemScreen = ({route, navigation}) => {
         </View>
         <View style={styles.productInfo}>
           <Text style={styles.productInfoLabel}>Barcode:</Text>
-          <Text style={styles.productInfoValue}>{product?.barcode}</Text>
+          <Text style={styles.productInfoValue}>
+            {product?.barcodes?.join(', ')}
+          </Text>
         </View>
         <View style={styles.productInfo}>
           <Text style={styles.productInfoLabel}>Quantity:</Text>
