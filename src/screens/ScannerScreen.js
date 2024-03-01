@@ -31,7 +31,9 @@ const ScannerScreen = ({route, navigation}) => {
 
   const fetchProduct = async code => {
     try {
-      const matchedProduct = products.find(p => p.barcodes.includes(code));
+      const matchedProduct = products.find(p =>
+        p.barcodes.some(b => b.includes(code)),
+      );
 
       if (!matchedProduct) {
         Alert.alert(

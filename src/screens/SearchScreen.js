@@ -48,6 +48,7 @@ const SearchScreen = ({route, navigation}) => {
     return (
       <TouchableOpacity
         style={styles.productContainer}
+        key={sku}
         onPress={() => handleProductPress(item)}>
         <FastImage
           source={images[image]}

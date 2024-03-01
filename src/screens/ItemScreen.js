@@ -37,7 +37,7 @@ const ItemScreen = ({route, navigation}) => {
       const order = orders[index];
       const itemIndex = order.items.findIndex(({sku}) => sku === product.sku);
       if (itemIndex !== -1) {
-        order.items[itemIndex].quantity = quantity;
+        order.items[itemIndex].quantity += quantity;
       } else {
         order.items.push({
           ...product,
@@ -97,6 +97,7 @@ const ItemScreen = ({route, navigation}) => {
           <View style={styles.quantityButtonGroup}>
             {[1, 2, 3, 4, 5].map(number => (
               <Button
+                key={number}
                 label={number.toString()}
                 onPress={() => handleQuantityPress(number)}
                 style={styles.quantityButton}
