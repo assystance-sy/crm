@@ -8,6 +8,7 @@ import {
   FlatList,
   ToastAndroid,
   PermissionsAndroid,
+  Share,
 } from 'react-native';
 import {DateTime} from 'luxon';
 import Button from '../components/Button';
@@ -118,7 +119,7 @@ const OrderDetailsScreen = ({route, navigation}) => {
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         const orderInfo = [];
         orderInfo.push(['Order Number', order.orderNumber].join(','));
-        orderInfo.push(['Merchant', order.merchant].join(','));
+        orderInfo.push(['Merchant', order.store.merchant].join(','));
         orderInfo.push(
           ['Store', `${order.store.name} - #${order.store.code}`].join(','),
         );
@@ -146,8 +147,8 @@ const OrderDetailsScreen = ({route, navigation}) => {
               name,
               brand,
               sku,
-              barcodes.join(','),
-              packSizes.join(','),
+              barcodes.join(' '),
+              packSizes.join(' '),
               quantity,
             ].join(',');
           })
