@@ -8,7 +8,6 @@ import {
   FlatList,
   ToastAndroid,
   PermissionsAndroid,
-  Share,
 } from 'react-native';
 import {DateTime} from 'luxon';
 import Button from '../components/Button';
@@ -23,6 +22,7 @@ const OrderDetailsScreen = ({route, navigation}) => {
   const {sharedData} = useContext(DataContext);
   const [order, setOrder] = useState({});
   const [items, setItems] = useState([]);
+  const [displayMode, setDisplayMode] = useState('detail');
   const isFocused = useIsFocused();
 
   const fetchOrder = async () => {
@@ -194,36 +194,46 @@ const OrderDetailsScreen = ({route, navigation}) => {
           resizeMode={FastImage.resizeMode.contain}
         />
         <View style={styles.productInfoContainer}>
-          <View style={styles.product}>
-            <Text style={styles.productLabel}>Name:</Text>
-            <Text style={styles.productValue}>{name}</Text>
-          </View>
-          <View style={styles.product}>
-            <Text style={styles.productLabel}>Brand:</Text>
-            <Text style={styles.productValue}>{brand}</Text>
-          </View>
+          {displayMode === 'detail' && (
+            <View style={styles.product}>
+              <Text style={styles.productLabel}>Name:</Text>
+              <Text style={styles.productValue}>{name}</Text>
+            </View>
+          )}
+          {displayMode === 'detail' && (
+            <View style={styles.product}>
+              <Text style={styles.productLabel}>Brand:</Text>
+              <Text style={styles.productValue}>{brand}</Text>
+            </View>
+          )}
           <View style={styles.product}>
             <Text style={styles.productLabel}>Code:</Text>
             <Text style={styles.productValue}>{sku}</Text>
           </View>
-          <View style={styles.product}>
-            <Text style={styles.productLabel}>Barcode:</Text>
-            <Text style={styles.productValue}>{barcodes.join(', ')}</Text>
-          </View>
-          <View style={styles.product}>
-            <Text style={styles.productLabel}>Pack Size:</Text>
-            <Text style={styles.productValue}>{packSizes.join(', ')}</Text>
-          </View>
+          {displayMode === 'detail' && (
+            <View style={styles.product}>
+              <Text style={styles.productLabel}>Barcode:</Text>
+              <Text style={styles.productValue}>{barcodes.join(', ')}</Text>
+            </View>
+          )}
+          {displayMode === 'detail' && (
+            <View style={styles.product}>
+              <Text style={styles.productLabel}>Pack Size:</Text>
+              <Text style={styles.productValue}>{packSizes.join(', ')}</Text>
+            </View>
+          )}
           <View style={styles.product}>
             <Text style={styles.productLabel}>Quantity:</Text>
             <Text style={styles.productValue}>{quantity}</Text>
           </View>
-          <View style={styles.product}>
-            <Text style={styles.productLabel}>Created At:</Text>
-            <Text style={styles.productValue}>
-              {DateTime.fromISO(createdAt).toFormat('dd/MM/yyyy HH:mm')}
-            </Text>
-          </View>
+          {displayMode === 'detail' && (
+            <View style={styles.product}>
+              <Text style={styles.productLabel}>Created At:</Text>
+              <Text style={styles.productValue}>
+                {DateTime.fromISO(createdAt).toFormat('dd/MM/yyyy HH:mm')}
+              </Text>
+            </View>
+          )}
         </View>
       </TouchableOpacity>
     );
@@ -239,10 +249,10 @@ const OrderDetailsScreen = ({route, navigation}) => {
         <Text style={styles.orderItemLabel}>Order Number:</Text>
         <Text style={styles.orderItemValue}>{order.orderNumber}</Text>
       </View>
-      <View style={styles.orderItem}>
-        <Text style={styles.orderItemLabel}>Merchant:</Text>
-        <Text style={styles.orderItemValue}>{order?.store?.merchant}</Text>
-      </View>
+      {/*<View style={styles.orderItem}>*/}
+      {/*  <Text style={styles.orderItemLabel}>Merchant:</Text>*/}
+      {/*  <Text style={styles.orderItemValue}>{order?.store?.merchant}</Text>*/}
+      {/*</View>*/}
       <View style={styles.orderItem}>
         <Text style={styles.orderItemLabel}>Store:</Text>
         <Text
@@ -270,16 +280,27 @@ const OrderDetailsScreen = ({route, navigation}) => {
             onPress={() => handleSortingPress('createdAt')}
           />
           <Button
-            label={'Brand'}
-            style={styles.sortingButton}
-            buttonTextStyle={{fontSize: 14}}
-            onPress={() => handleSortingPress('brand')}
-          />
-          <Button
             label={'Code'}
             style={styles.sortingButton}
             buttonTextStyle={{fontSize: 14}}
             onPress={() => handleSortingPress('sku')}
+          />
+        </View>
+      </View>
+      <View style={styles.orderItem}>
+        <Text style={styles.orderItemLabel}>Display mode:</Text>
+        <View style={styles.sortingButtonGroup}>
+          <Button
+            label={'Detail'}
+            style={styles.sortingButton}
+            buttonTextStyle={{fontSize: 14}}
+            onPress={() => setDisplayMode('detail')}
+          />
+          <Button
+            label={'Minimal'}
+            style={styles.sortingButton}
+            buttonTextStyle={{fontSize: 14}}
+            onPress={() => setDisplayMode('minimal')}
           />
         </View>
       </View>
@@ -314,7 +335,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f0f0f0',
     paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingVertical: 10,
     justifyContent: 'space-between',
   },
   orderItem: {
@@ -377,7 +398,7 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   buttonGroup: {
-    paddingTop: 20,
+    paddingTop: 10,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
   },
