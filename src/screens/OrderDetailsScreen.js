@@ -3,36 +3,30 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Alert,
-  FlatList,
   ToastAndroid,
   PermissionsAndroid,
+  TextInput,
+  ScrollView,
 } from 'react-native';
 import {DateTime} from 'luxon';
 import Button from '../components/Button';
 import DataContext from '../services/DataContext';
-import images from '../assets/images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useIsFocused} from '@react-navigation/native';
-import FastImage from 'react-native-fast-image';
 import {Dirs, FileSystem} from 'react-native-file-access';
 
 const OrderDetailsScreen = ({route, navigation}) => {
   const {sharedData} = useContext(DataContext);
   const [order, setOrder] = useState({});
-  const [items, setItems] = useState([]);
-  const [displayMode, setDisplayMode] = useState('detail');
-  const isFocused = useIsFocused();
+  const [notes, setNotes] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
 
   const fetchOrder = async () => {
     try {
       let orders = await AsyncStorage.getItem('orders');
       if (orders === null) {
-        Alert.alert('Order not found', '', [
-          {text: 'OK', onPress: () => navigation.goBack()},
-        ]);
-
+        ToastAndroid.show('Order not found', ToastAndroid.SHORT);
+        navigation.goBack();
         return;
       }
 
@@ -41,19 +35,44 @@ const OrderDetailsScreen = ({route, navigation}) => {
         o => o.orderNumber === sharedData.purchaseOrderNumber,
       );
       if (index === -1) {
-        Alert.alert('Order not found', '', [
-          {text: 'OK', onPress: () => navigation.goBack()},
-        ]);
-
+        ToastAndroid.show('Order not found', ToastAndroid.SHORT);
+        navigation.goBack();
         return;
       }
 
       setOrder(orders[index]);
-      setItems(orders[index]?.items);
+      setNotes(orders[index]?.notes || '');
     } catch (e) {
-      Alert.alert('Failed to remove item', `Error message: ${e.message}`, [
-        {text: 'OK'},
-      ]);
+      ToastAndroid.show('Failed to fetch order', ToastAndroid.SHORT);
+      navigation.goBack();
+    }
+  };
+
+  const handleUpdateNotes = async () => {
+    try {
+      let orders = await AsyncStorage.getItem('orders');
+      if (orders === null) {
+        ToastAndroid.show('Order not found', ToastAndroid.SHORT);
+        navigation.goBack();
+        return;
+      }
+
+      orders = JSON.parse(orders);
+      const index = orders.findIndex(
+        o => o.orderNumber === sharedData.purchaseOrderNumber,
+      );
+      if (index === -1) {
+        ToastAndroid.show('Order not found', ToastAndroid.SHORT);
+        navigation.goBack();
+        return;
+      }
+
+      orders[index].notes = notes;
+      await AsyncStorage.setItem('orders', JSON.stringify(orders));
+      setIsEditing(false);
+      ToastAndroid.show('Saved', ToastAndroid.SHORT);
+    } catch (e) {
+      ToastAndroid.show('Failed to update notes', ToastAndroid.SHORT);
     }
   };
 
@@ -61,10 +80,8 @@ const OrderDetailsScreen = ({route, navigation}) => {
     try {
       let orders = await AsyncStorage.getItem('orders');
       if (orders === null) {
-        Alert.alert('Order not found', '', [
-          {text: 'OK', onPress: () => navigation.navigate('Home')},
-        ]);
-
+        ToastAndroid.show('Order not found', ToastAndroid.SHORT);
+        navigation.goBack();
         return;
       }
 
@@ -73,10 +90,8 @@ const OrderDetailsScreen = ({route, navigation}) => {
         o => o.orderNumber === sharedData.purchaseOrderNumber,
       );
       if (index === -1) {
-        Alert.alert('Order not found', '', [
-          {text: 'OK', onPress: () => navigation.navigate('Home')},
-        ]);
-
+        ToastAndroid.show('Order not found', ToastAndroid.SHORT);
+        navigation.goBack();
         return;
       }
 
@@ -85,9 +100,7 @@ const OrderDetailsScreen = ({route, navigation}) => {
 
       navigation.goBack();
     } catch (e) {
-      Alert.alert('Failed to remove order', `Error message: ${e.message}`, [
-        {text: 'OK'},
-      ]);
+      ToastAndroid.show('Failed to remove order', ToastAndroid.SHORT);
     }
   };
 
@@ -96,10 +109,6 @@ const OrderDetailsScreen = ({route, navigation}) => {
       {text: 'OK', onPress: handleRemove},
       {text: 'Cancel'},
     ]);
-  };
-
-  const handleOrderItemPress = product => {
-    navigation.push('Edit Item', {product});
   };
 
   const handleExportPress = async () => {
@@ -140,7 +149,7 @@ const OrderDetailsScreen = ({route, navigation}) => {
           '\n',
         ].join(',');
 
-        const data = items
+        const data = order.items
           .map(item => {
             const {name, brand, sku, barcodes, packSizes, quantity} = item;
             return [
@@ -173,155 +182,86 @@ const OrderDetailsScreen = ({route, navigation}) => {
     navigation.navigate('Scanner');
   };
 
-  const handleSortingPress = sortBy => {
-    const newList = items
-      .sort((a, b) => a[sortBy].localeCompare(b[sortBy]))
-      .map((p, index) => ({...p, key: index}));
-    setItems(newList);
-  };
-
-  const renderOrderItem = ({item}) => {
-    const {image, name, sku, barcodes, packSizes, quantity, createdAt, brand} =
-      item || {};
-    return (
-      <TouchableOpacity
-        style={styles.productContainer}
-        key={sku}
-        onPress={() => handleOrderItemPress(item)}>
-        <FastImage
-          source={images[image]}
-          style={styles.productImage}
-          resizeMode={FastImage.resizeMode.contain}
-        />
-        <View style={styles.productInfoContainer}>
-          {displayMode === 'detail' && (
-            <View style={styles.product}>
-              <Text style={styles.productLabel}>Name:</Text>
-              <Text style={styles.productValue}>{name}</Text>
-            </View>
-          )}
-          {displayMode === 'detail' && (
-            <View style={styles.product}>
-              <Text style={styles.productLabel}>Brand:</Text>
-              <Text style={styles.productValue}>{brand}</Text>
-            </View>
-          )}
-          <View style={styles.product}>
-            <Text style={styles.productLabel}>Code:</Text>
-            <Text style={styles.productValue}>{sku}</Text>
-          </View>
-          {displayMode === 'detail' && (
-            <View style={styles.product}>
-              <Text style={styles.productLabel}>Barcode:</Text>
-              <Text style={styles.productValue}>{barcodes.join(', ')}</Text>
-            </View>
-          )}
-          {displayMode === 'detail' && (
-            <View style={styles.product}>
-              <Text style={styles.productLabel}>Pack Size:</Text>
-              <Text style={styles.productValue}>{packSizes.join(', ')}</Text>
-            </View>
-          )}
-          <View style={styles.product}>
-            <Text style={styles.productLabel}>Quantity:</Text>
-            <Text style={styles.productValue}>{quantity}</Text>
-          </View>
-          {displayMode === 'detail' && (
-            <View style={styles.product}>
-              <Text style={styles.productLabel}>Created At:</Text>
-              <Text style={styles.productValue}>
-                {DateTime.fromISO(createdAt).toFormat('dd/MM/yyyy HH:mm')}
-              </Text>
-            </View>
-          )}
-        </View>
-      </TouchableOpacity>
-    );
+  const handleViewItemPress = () => {
+    navigation.navigate('Order Items');
   };
 
   useEffect(() => {
     fetchOrder();
-  }, [isFocused]);
+  }, []);
 
   return (
     <View style={styles.container}>
-      <View style={styles.orderItem}>
-        <Text style={styles.orderItemLabel}>Order Number:</Text>
-        <Text style={styles.orderItemValue}>{order.orderNumber}</Text>
-      </View>
-      {/*<View style={styles.orderItem}>*/}
-      {/*  <Text style={styles.orderItemLabel}>Merchant:</Text>*/}
-      {/*  <Text style={styles.orderItemValue}>{order?.store?.merchant}</Text>*/}
-      {/*</View>*/}
-      <View style={styles.orderItem}>
-        <Text style={styles.orderItemLabel}>Store:</Text>
-        <Text
-          style={
-            styles.orderItemValue
-          }>{`${order?.store?.name} - #${order?.store?.code}`}</Text>
-      </View>
-      <View style={styles.orderItem}>
-        <Text style={styles.orderItemLabel}>Created At:</Text>
-        <Text style={styles.orderItemValue}>
-          {DateTime.fromISO(order?.createdAt).toFormat('dd/MM/yyyy HH:mm')}
-        </Text>
-      </View>
-      <View style={styles.orderItem}>
-        <Text style={styles.orderItemLabel}>No. of Items:</Text>
-        <Text style={styles.orderItemValue}>{(order?.items || []).length}</Text>
-      </View>
-      <View style={styles.orderItem}>
-        <Text style={styles.orderItemLabel}>Sort By:</Text>
-        <View style={styles.sortingButtonGroup}>
-          <Button
-            label={'Created At'}
-            style={styles.sortingButton}
-            buttonTextStyle={{fontSize: 14}}
-            onPress={() => handleSortingPress('createdAt')}
-          />
-          <Button
-            label={'Code'}
-            style={styles.sortingButton}
-            buttonTextStyle={{fontSize: 14}}
-            onPress={() => handleSortingPress('sku')}
-          />
+      <ScrollView>
+        <View style={styles.orderItem}>
+          <Text style={styles.orderItemLabel}>Order Number:</Text>
+          <Text style={styles.orderItemValue}>{order.orderNumber}</Text>
         </View>
-      </View>
-      <View style={styles.orderItem}>
-        <Text style={styles.orderItemLabel}>Display mode:</Text>
-        <View style={styles.sortingButtonGroup}>
-          <Button
-            label={'Detail'}
-            style={styles.sortingButton}
-            buttonTextStyle={{fontSize: 14}}
-            onPress={() => setDisplayMode('detail')}
-          />
-          <Button
-            label={'Minimal'}
-            style={styles.sortingButton}
-            buttonTextStyle={{fontSize: 14}}
-            onPress={() => setDisplayMode('minimal')}
-          />
+        <View style={styles.orderItem}>
+          <Text style={styles.orderItemLabel}>Store:</Text>
+          <Text
+            style={
+              styles.orderItemValue
+            }>{`${order?.store?.name} - #${order?.store?.code}`}</Text>
         </View>
-      </View>
-
-      <FlatList
-        data={items}
-        renderItem={renderOrderItem}
-        keyExtractor={item => item.sku}
-        contentContainerStyle={styles.productListContainer}
-        maxToRenderPerBatch={10}
-      />
+        <View style={styles.orderItem}>
+          <Text style={styles.orderItemLabel}>Created At:</Text>
+          <Text style={styles.orderItemValue}>
+            {DateTime.fromISO(order?.createdAt).toFormat('dd/MM/yyyy HH:mm')}
+          </Text>
+        </View>
+        <View style={styles.orderItem}>
+          <Text style={styles.orderItemLabel}>No. of Items:</Text>
+          <Text style={styles.orderItemValue}>
+            {(order?.items || []).length}
+          </Text>
+        </View>
+        <View style={styles.orderItem}>
+          <Text style={styles.orderItemLabel}>Notes:</Text>
+          <View style={styles.notesInput}>
+            <TextInput
+              style={styles.textInput}
+              value={notes}
+              onChangeText={value => setNotes(value)}
+              multiline={true}
+              editable={isEditing}
+            />
+            <View style={styles.notesButtonGroup}>
+              <Button
+                label={'Edit'}
+                onPress={() => setIsEditing(true)}
+                style={isEditing ? styles.disabledButton : styles.notesButton}
+                disabled={isEditing}
+              />
+              <Button
+                label={'Save'}
+                onPress={handleUpdateNotes}
+                style={isEditing ? styles.notesButton : styles.disabledButton}
+                disabled={!isEditing}
+              />
+            </View>
+          </View>
+        </View>
+      </ScrollView>
 
       <View style={styles.buttonGroup}>
         <Button
-          label={'Remove'}
+          label={'View Items'}
+          onPress={handleViewItemPress}
+          style={styles.button}
+        />
+        <Button
+          label={'Add Item'}
+          onPress={handleAddPress}
+          style={styles.button}
+        />
+        <Button
+          label={'Remove Order'}
           onPress={handleRemovePress}
           style={styles.button}
         />
-        <Button label={'Add'} onPress={handleAddPress} style={styles.button} />
         <Button
-          label={'Export'}
+          label={'Export Order'}
           onPress={handleExportPress}
           style={styles.button}
         />
@@ -401,9 +341,11 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     flexDirection: 'row',
     justifyContent: 'space-evenly',
+    flexWrap: 'wrap',
+    rowGap: 10,
   },
   button: {
-    width: '30%',
+    width: '45%',
     paddingHorizontal: 10,
   },
   sortingButtonGroup: {
@@ -414,6 +356,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     width: 'fit-content',
     paddingVertical: 5,
+  },
+  textInput: {
+    borderWidth: 1,
+    color: '#000000',
+  },
+  notesInput: {
+    flexGrow: 1,
+    rowGap: 10,
+  },
+  notesButtonGroup: {
+    flexDirection: 'row',
+    alignSelf: 'flex-end',
+    columnGap: 10,
+  },
+  notesButton: {
+    width: '30%',
+    paddingHorizontal: 10,
+  },
+  disabledButton: {
+    width: '30%',
+    paddingHorizontal: 10,
+    opacity: 0.2,
   },
 });
 

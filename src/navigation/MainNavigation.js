@@ -11,6 +11,7 @@ import OrdersScreen from '../screens/OrdersScreen';
 import OrderDetailsScreen from '../screens/OrderDetailsScreen';
 import SearchScreen from '../screens/SearchScreen';
 import EditItemScreen from '../screens/EditItemScreen';
+import OrderItemsScreen from '../screens/OrderItemsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +29,7 @@ function MainNavigation() {
         <Stack.Screen name="Order Details" component={OrderDetailsScreen} />
         <Stack.Screen name="Search" component={SearchScreen} />
         <Stack.Screen name="Edit Item" component={EditItemScreen} />
+        <Stack.Screen name="Order Items" component={OrderItemsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
