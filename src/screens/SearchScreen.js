@@ -79,40 +79,32 @@ const SearchScreen = ({route, navigation}) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.upperContainer}>
-        <View>
-          <Text style={styles.productLabel}>Barcode:</Text>
-          <TextInput
-            style={styles.textInput}
-            value={barcode}
-            onTextInput={() => setName('')}
-            onChangeText={value => setBarcode(value)}
-            onEndEditing={() => searchByBarcode()}
-            keyboardType={'numeric'}
-          />
-        </View>
+      <Text style={styles.productLabel}>Barcode:</Text>
+      <TextInput
+        style={styles.textInput}
+        value={barcode}
+        onTextInput={() => setName('')}
+        onChangeText={value => setBarcode(value)}
+        onEndEditing={() => searchByBarcode()}
+        keyboardType={'numeric'}
+      />
 
-        <View>
-          <Text style={styles.productLabel}>Name:</Text>
-          <TextInput
-            style={styles.textInput}
-            value={name}
-            onTextInput={() => setBarcode('')}
-            onChangeText={value => setName(value)}
-            onEndEditing={() => searchByName()}
-          />
-        </View>
+      <Text style={styles.productLabel}>Name:</Text>
+      <TextInput
+        style={styles.textInput}
+        value={name}
+        onTextInput={() => setBarcode('')}
+        onChangeText={value => setName(value)}
+        onEndEditing={() => searchByName()}
+      />
 
-        <View>
-          <Text style={styles.productLabel}>Products:</Text>
-          <FlatList
-            data={matchedProducts}
-            renderItem={renderOrderItem}
-            keyExtractor={item => item.key}
-            contentContainerStyle={styles.productListContainer}
-          />
-        </View>
-      </View>
+      <Text style={styles.productLabel}>Products:</Text>
+      <FlatList
+        data={matchedProducts}
+        renderItem={renderOrderItem}
+        keyExtractor={item => item.key}
+        contentContainerStyle={styles.productListContainer}
+      />
 
       <Button label={'Back'} onPress={handleBackPress} />
     </View>
@@ -121,10 +113,11 @@ const SearchScreen = ({route, navigation}) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: '#f0f0f0',
     padding: 20,
     justifyContent: 'space-between',
+    rowGap: 10,
+    height: '100%',
   },
   textInput: {
     borderWidth: 1,
@@ -159,20 +152,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     columnGap: 10,
   },
-  productListContentContainer: {},
   productListContainer: {
     paddingBottom: 20,
     rowGap: 10,
+    flexGrow: 1,
   },
   productInfoContainer: {
     flex: 1,
-  },
-  noProduct: {
-    textAlign: 'center',
-    color: '#000000',
-  },
-  upperContainer: {
-    rowGap: 10,
   },
 });
 
