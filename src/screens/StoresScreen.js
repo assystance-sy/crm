@@ -34,9 +34,9 @@ const StoreScreen = () => {
               styles.storeListItemValue
             }>{`${street}, ${city}, ${province}, ${postalCode}`}</Text>
         </View>
-        {staffs.map(storeStaff => {
+        {staffs.map((storeStaff, index) => {
           return (
-            <>
+            <View key={index}>
               <View style={styles.storeListItem}>
                 <Text style={styles.storeListItemLabel}>Manager:</Text>
                 <Text style={styles.storeListItemValue}>
@@ -51,7 +51,7 @@ const StoreScreen = () => {
                   ))}
                 </View>
               </View>
-            </>
+            </View>
           );
         })}
       </TouchableOpacity>

@@ -1,8 +1,11 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
+  PermissionsAndroid,
   SectionList,
   StyleSheet,
   Text,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -10,12 +13,15 @@ import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {DateTime} from 'luxon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DataContext from '../services/DataContext';
+import Button from '../components/Button';
+import {Dirs, FileSystem} from 'react-native-file-access';
 
 const OrdersScreen = () => {
   const {updateSharedData} = useContext(DataContext);
   const isFocused = useIsFocused();
   const navigation = useNavigation();
   const [orders, setOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleOrderPress = order => {
     updateSharedData({purchaseOrderNumber: order.orderNumber});
@@ -52,6 +58,91 @@ const OrdersScreen = () => {
         ),
       );
       setOrders(parsedData);
+    }
+  };
+
+  const exportOrder = async order => {
+    try {
+      const orderInfo = [];
+      orderInfo.push(['Order Number', order.orderNumber].join(','));
+      orderInfo.push(['Merchant', order.store.merchant].join(','));
+      orderInfo.push(
+        ['Store', `${order.store.name} - #${order.store.code}`].join(','),
+      );
+      orderInfo.push(
+        [
+          'Created At',
+          DateTime.fromISO(order.createdAt).toFormat('dd/MM/yyyy HH:mm'),
+        ].join(','),
+      );
+      orderInfo.push(['Notes', order.notes].join(','));
+
+      const headers = [
+        'Name',
+        'Brand',
+        'Barcode',
+        'Pack Size',
+        'Code',
+        'Quantity',
+        '\n',
+      ].join(',');
+
+      const data = order.items
+        .sort((a, b) => a.sku - b.sku)
+        .map(item => {
+          const {name, brand, sku, barcodes, packSizes, quantity} = item;
+          return [
+            name,
+            brand,
+            barcodes.join(' '),
+            packSizes.join(' '),
+            sku,
+            quantity,
+          ].join(',');
+        })
+        .join('\n');
+
+      const csv = `${orderInfo.join('\n')}\n\n${headers}${data}`;
+      const fileName = `${order.orderNumber}_#${order.store.code}.csv`;
+      const filePath = `${Dirs.DocumentDir}/${fileName}`;
+
+      await FileSystem.writeFile(filePath, csv, 'utf8');
+
+      await FileSystem.cpExternal(filePath, fileName, 'downloads');
+    } catch (e) {
+      ToastAndroid.show('Failed to export', ToastAndroid.SHORT);
+    }
+  };
+
+  const handleExportPress = async date => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'Require Permission For Writing To External Storage',
+          message:
+            'Need to access your external storage in order to export the order.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+
+      if (!granted) {
+        return;
+      }
+
+      setIsLoading(true);
+
+      const selectedOrders = orders.find(order => order.title === date).data;
+
+      await Promise.all(selectedOrders.map(order => exportOrder(order)));
+
+      ToastAndroid.show('Saved to /Download', ToastAndroid.SHORT);
+    } catch (e) {
+      ToastAndroid.show('Failed to export', ToastAndroid.SHORT);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -98,13 +189,28 @@ const OrdersScreen = () => {
   return (
     <View style={styles.container}>
       <SectionList
+        style={styles.orderList}
         sections={orders}
         keyExtractor={item => item.orderNumber}
         renderItem={renderOrderItem}
         renderSectionHeader={({section: {title}}) => (
-          <Text style={styles.sectionTitle}>{title}</Text>
+          <View style={styles.sectionTitle}>
+            <Text style={styles.sectionTitleText}>{title}</Text>
+            <Button
+              label={'Export'}
+              style={styles.sectionTitleButton}
+              buttonTextStyle={{fontSize: 14}}
+              onPress={() => handleExportPress(title)}
+            />
+          </View>
         )}
       />
+
+      {isLoading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" />
+        </View>
+      )}
     </View>
   );
 };
@@ -113,12 +219,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f0f0f0',
-    paddingHorizontal: 20,
     justifyContent: 'space-between',
   },
   orderList: {
-    flexGrow: 1,
-    marginBottom: 20,
+    paddingHorizontal: 20,
   },
   orderListItem: {
     flexDirection: 'row',
@@ -144,6 +248,24 @@ const styles = StyleSheet.create({
   sectionTitle: {
     marginTop: 20,
     color: '#000000',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  sectionTitleText: {
+    color: '#000000',
+  },
+  sectionTitleButton: {
+    paddingHorizontal: 10,
+    width: 'fit-content',
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    height: '100%',
+    width: '100%',
+    backgroundColor: '#000000',
+    opacity: 0.5,
+    justifyContent: 'center',
   },
 });
 
