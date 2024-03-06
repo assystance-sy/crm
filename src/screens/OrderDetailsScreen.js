@@ -14,9 +14,11 @@ import Button from '../components/Button';
 import DataContext from '../services/DataContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Dirs, FileSystem} from 'react-native-file-access';
+import {useIsFocused} from '@react-navigation/native';
 
 const OrderDetailsScreen = ({route, navigation}) => {
   const {sharedData} = useContext(DataContext);
+  const isFocused = useIsFocused();
   const [order, setOrder] = useState({});
   const [notes, setNotes] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -166,7 +168,7 @@ const OrderDetailsScreen = ({route, navigation}) => {
           .join('\n');
 
         const csv = `${orderInfo.join('\n')}\n\n${headers}${data}`;
-        const fileName = `${order.orderNumber}.csv`;
+        const fileName = `${order.orderNumber}_#${order.store.code}.csv`;
         const filePath = `${Dirs.DocumentDir}/${fileName}`;
 
         await FileSystem.writeFile(filePath, csv, 'utf8');
@@ -190,7 +192,7 @@ const OrderDetailsScreen = ({route, navigation}) => {
 
   useEffect(() => {
     fetchOrder();
-  }, []);
+  }, [isFocused]);
 
   return (
     <View style={styles.container}>

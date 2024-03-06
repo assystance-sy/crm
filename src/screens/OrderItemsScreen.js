@@ -13,9 +13,11 @@ import DataContext from '../services/DataContext';
 import images from '../assets/images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FastImage from 'react-native-fast-image';
+import {useIsFocused} from '@react-navigation/native';
 
 const OrderItemsScreen = ({route, navigation}) => {
   const {sharedData} = useContext(DataContext);
+  const isFocused = useIsFocused();
   const [items, setItems] = useState([]);
   const [displayMode, setDisplayMode] = useState('detail');
 
@@ -121,7 +123,7 @@ const OrderItemsScreen = ({route, navigation}) => {
 
   useEffect(() => {
     fetchOrder();
-  }, []);
+  }, [isFocused]);
 
   return (
     <View style={styles.container}>

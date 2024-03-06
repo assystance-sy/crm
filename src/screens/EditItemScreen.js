@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import {View, StyleSheet, Text, Image, Alert} from 'react-native';
+import {View, StyleSheet, Text, Image, Alert, ToastAndroid} from 'react-native';
 import Button from '../components/Button';
 import images from '../assets/images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,10 +13,8 @@ const EditItemScreen = ({route, navigation}) => {
     try {
       let orders = await AsyncStorage.getItem('orders');
       if (orders === null) {
-        Alert.alert('Order not found', '', [
-          {text: 'OK', onPress: () => navigation.navigate('Home')},
-        ]);
-
+        ToastAndroid.show('Order not found', ToastAndroid.SHORT);
+        navigation.goBack();
         return;
       }
 
@@ -25,24 +23,28 @@ const EditItemScreen = ({route, navigation}) => {
         o => o.orderNumber === sharedData.purchaseOrderNumber,
       );
       if (index === -1) {
-        Alert.alert('Order not found', '', [
-          {text: 'OK', onPress: () => navigation.navigate('Home')},
-        ]);
-
+        ToastAndroid.show('Order not found', ToastAndroid.SHORT);
+        navigation.goBack();
         return;
       }
 
       const order = orders[index];
       const itemIndex = order.items.findIndex(i => i.sku === product.sku);
+      if (itemIndex === -1) {
+        ToastAndroid.show('Item not found', ToastAndroid.SHORT);
+        navigation.goBack();
+        return;
+      }
+
       order.items[itemIndex].quantity = quantity;
       orders[index] = order;
       await AsyncStorage.setItem('orders', JSON.stringify(orders));
 
+      ToastAndroid.show('Updated', ToastAndroid.SHORT);
+
       navigation.goBack();
     } catch (e) {
-      Alert.alert('Failed to add item', `Error message: ${e.message}`, [
-        {text: 'OK'},
-      ]);
+      ToastAndroid.show('Failed to update item', ToastAndroid.SHORT);
     }
   };
 
@@ -50,10 +52,8 @@ const EditItemScreen = ({route, navigation}) => {
     try {
       let orders = await AsyncStorage.getItem('orders');
       if (orders === null) {
-        Alert.alert('Order not found', '', [
-          {text: 'OK', onPress: () => navigation.navigate('Home')},
-        ]);
-
+        ToastAndroid.show('Order not found', ToastAndroid.SHORT);
+        navigation.goBack();
         return;
       }
 
@@ -62,24 +62,28 @@ const EditItemScreen = ({route, navigation}) => {
         o => o.orderNumber === sharedData.purchaseOrderNumber,
       );
       if (index === -1) {
-        Alert.alert('Order not found', '', [
-          {text: 'OK', onPress: () => navigation.navigate('Home')},
-        ]);
-
+        ToastAndroid.show('Order not found', ToastAndroid.SHORT);
+        navigation.goBack();
         return;
       }
 
       const order = orders[index];
       const itemIndex = order.items.findIndex(i => i.sku === product.sku);
+      if (itemIndex === -1) {
+        ToastAndroid.show('Item not found', ToastAndroid.SHORT);
+        navigation.goBack();
+        return;
+      }
+
       order.items.splice(itemIndex, 1);
       orders[index] = order;
       await AsyncStorage.setItem('orders', JSON.stringify(orders));
 
+      ToastAndroid.show('Removed', ToastAndroid.SHORT);
+
       navigation.goBack();
     } catch (e) {
-      Alert.alert('Failed to remove item', `Error message: ${e.message}`, [
-        {text: 'OK'},
-      ]);
+      ToastAndroid.show('Failed to remove item', ToastAndroid.SHORT);
     }
   };
 
