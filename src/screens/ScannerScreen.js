@@ -9,9 +9,11 @@ import {
 import Button from '../components/Button';
 import DataContext from '../services/DataContext';
 import products from '../database/products.json';
+import {useIsFocused} from '@react-navigation/native';
 
 const ScannerScreen = ({route, navigation}) => {
   const {sharedData} = useContext(DataContext);
+  const isFocused = useIsFocused();
   const {hasPermission} = useCameraPermission();
   const device = useCameraDevice('back');
   const [cameraOn, setCameraOn] = useState(false);
@@ -89,7 +91,7 @@ const ScannerScreen = ({route, navigation}) => {
           <Camera
             style={styles.camera}
             device={device}
-            isActive={cameraOn && hasPermission}
+            isActive={cameraOn && hasPermission && isFocused}
             codeScanner={codeScanner}
           />
         )}
