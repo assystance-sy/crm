@@ -67,13 +67,13 @@ const OrdersScreen = () => {
         key={orderNumber}
         onPress={() => handleOrderPress(item)}>
         <View style={styles.orderListItem}>
-          <Text style={styles.orderListItemLabel}>Order Number:</Text>
+          <Text style={styles.orderListItemLabel}>Order No.:</Text>
           <Text style={styles.orderListItemValue}>{orderNumber}</Text>
         </View>
-        <View style={styles.orderListItem}>
-          <Text style={styles.orderListItemLabel}>Merchant:</Text>
-          <Text style={styles.orderListItemValue}>{store.merchant}</Text>
-        </View>
+        {/*<View style={styles.orderListItem}>*/}
+        {/*  <Text style={styles.orderListItemLabel}>Merchant:</Text>*/}
+        {/*  <Text style={styles.orderListItemValue}>{store.merchant}</Text>*/}
+        {/*</View>*/}
         <View style={styles.orderListItem}>
           <Text style={styles.orderListItemLabel}>Store:</Text>
           <Text
@@ -84,13 +84,13 @@ const OrdersScreen = () => {
         <View style={styles.orderListItem}>
           <Text style={styles.orderListItemLabel}>Created At:</Text>
           <Text style={styles.orderListItemValue}>
-            {DateTime.fromISO(createdAt).toFormat('dd/MM/yyyy HH:mm')}
+            {DateTime.fromISO(createdAt).toFormat('HH:mm')}
           </Text>
         </View>
-        <View style={styles.orderListItem}>
-          <Text style={styles.orderListItemLabel}>No. of Items:</Text>
-          <Text style={styles.orderListItemValue}>{items.length}</Text>
-        </View>
+        {/*<View style={styles.orderListItem}>*/}
+        {/*  <Text style={styles.orderListItemLabel}>No. of Items:</Text>*/}
+        {/*  <Text style={styles.orderListItemValue}>{items.length}</Text>*/}
+        {/*</View>*/}
       </TouchableOpacity>
     );
   };
