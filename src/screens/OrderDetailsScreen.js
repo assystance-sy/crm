@@ -138,26 +138,28 @@ const OrderDetailsScreen = ({route, navigation}) => {
             DateTime.fromISO(order.createdAt).toFormat('dd/MM/yyyy HH:mm'),
           ].join(','),
         );
+        orderInfo.push(['Notes', order.notes].join(','));
 
         const headers = [
           'Name',
           'Brand',
-          'Code',
           'Barcode',
           'Pack Size',
+          'Code',
           'Quantity',
           '\n',
         ].join(',');
 
         const data = order.items
+          .sort((a, b) => a.sku - b.sku)
           .map(item => {
             const {name, brand, sku, barcodes, packSizes, quantity} = item;
             return [
               name,
               brand,
-              sku,
               barcodes.join(' '),
               packSizes.join(' '),
+              sku,
               quantity,
             ].join(',');
           })
