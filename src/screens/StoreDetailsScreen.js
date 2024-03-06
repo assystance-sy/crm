@@ -53,9 +53,9 @@ const StoreDetailsScreen = ({route, navigation}) => {
             </Text>
           </TouchableOpacity>
         </View>
-        {staffs.map(storeStaff => {
+        {staffs.map((storeStaff, index) => {
           return (
-            <>
+            <View key={index}>
               <View style={styles.storeItem}>
                 <Text style={styles.storeItemLabel}>Manager:</Text>
                 <Text style={styles.storeItemValue}>
@@ -72,7 +72,7 @@ const StoreDetailsScreen = ({route, navigation}) => {
                   </TouchableOpacity>
                 ))}
               </View>
-            </>
+            </View>
           );
         })}
         {/*<View style={styles.storeItem}>*/}
