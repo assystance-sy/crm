@@ -75,10 +75,10 @@ const StoreDetailsScreen = ({route, navigation}) => {
             </>
           );
         })}
-        <View style={styles.storeItem}>
-          <Text style={styles.storeItemLabel}>Remark:</Text>
-          <Text style={styles.storeItemValue}>{remark}</Text>
-        </View>
+        {/*<View style={styles.storeItem}>*/}
+        {/*  <Text style={styles.storeItemLabel}>Remark:</Text>*/}
+        {/*  <Text style={styles.storeItemValue}>{remark}</Text>*/}
+        {/*</View>*/}
       </View>
     </View>
   );

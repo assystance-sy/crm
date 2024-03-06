@@ -190,6 +190,10 @@ const OrderDetailsScreen = ({route, navigation}) => {
     navigation.navigate('Order Items');
   };
 
+  const handleStoreDetailsPress = () => {
+    navigation.push('Store Details', {store: order.store});
+  };
+
   useEffect(() => {
     fetchOrder();
   }, [isFocused]);
@@ -203,10 +207,17 @@ const OrderDetailsScreen = ({route, navigation}) => {
         </View>
         <View style={styles.orderItem}>
           <Text style={styles.orderItemLabel}>Store:</Text>
-          <Text
-            style={
-              styles.orderItemValue
-            }>{`${order?.store?.name} - #${order?.store?.code}`}</Text>
+          <View style={styles.storeDetails}>
+            <Text
+              style={
+                styles.orderItemValue
+              }>{`${order?.store?.name} - #${order?.store?.code}`}</Text>
+            <Button
+              label={'Details'}
+              onPress={handleStoreDetailsPress}
+              style={styles.storeDetailsButton}
+            />
+          </View>
         </View>
         <View style={styles.orderItem}>
           <Text style={styles.orderItemLabel}>Created At:</Text>
@@ -382,6 +393,15 @@ const styles = StyleSheet.create({
     width: '30%',
     paddingHorizontal: 10,
     opacity: 0.2,
+  },
+  storeDetailsButton: {
+    width: 'fit-content',
+    paddingHorizontal: 10,
+  },
+  storeDetails: {
+    flexDirection: 'row',
+    columnGap: 10,
+    flex: 1,
   },
 });
 
