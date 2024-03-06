@@ -26,11 +26,9 @@ const SearchScreen = ({route, navigation}) => {
   };
 
   const searchByName = () => {
-    const regex = new RegExp(
-      `^.*${name.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}.*$`,
-      'gi',
+    const existingProducts = products.filter(p =>
+      p.name.toLowerCase().includes(name.toLowerCase()),
     );
-    const existingProducts = products.filter(p => regex.test(p.name));
     setMatchedProducts(existingProducts);
     setName('');
   };
@@ -102,7 +100,7 @@ const SearchScreen = ({route, navigation}) => {
       <FlatList
         data={matchedProducts}
         renderItem={renderOrderItem}
-        keyExtractor={item => item.key}
+        keyExtractor={item => item.sku}
         contentContainerStyle={styles.productListContainer}
       />
 
