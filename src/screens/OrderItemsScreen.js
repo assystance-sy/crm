@@ -52,7 +52,7 @@ const OrderItemsScreen = ({route, navigation}) => {
   };
 
   const handleAddPress = () => {
-    navigation.navigate('Scanner');
+    navigation.navigate('Scanner', {prevScreen: 'Order Items'});
   };
 
   const handleSortingPress = sortBy => {

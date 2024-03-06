@@ -12,6 +12,7 @@ import products from '../database/products.json';
 import {useIsFocused} from '@react-navigation/native';
 
 const ScannerScreen = ({route, navigation}) => {
+  const {prevScreen} = route?.params || {};
   const {sharedData} = useContext(DataContext);
   const isFocused = useIsFocused();
   const {hasPermission} = useCameraPermission();
@@ -51,6 +52,7 @@ const ScannerScreen = ({route, navigation}) => {
       }
 
       setBarcode('');
+      setCameraOn(false);
 
       navigation.push('Item', {product: matchedProduct});
     } catch (error) {
@@ -70,7 +72,13 @@ const ScannerScreen = ({route, navigation}) => {
   };
 
   const onDonePress = () => {
-    navigation.navigate('Home');
+    setCameraOn(false);
+
+    if (prevScreen) {
+      navigation.navigate(prevScreen);
+    } else {
+      navigation.popToTop();
+    }
   };
 
   useEffect(() => {
@@ -78,6 +86,13 @@ const ScannerScreen = ({route, navigation}) => {
       fetchProduct(barcode);
     }
   }, [barcode]);
+
+  useEffect(() => {
+    if (isFocused) {
+      setBarcode('');
+      setCameraOn(false);
+    }
+  }, [isFocused]);
 
   return (
     <View style={styles.container}>

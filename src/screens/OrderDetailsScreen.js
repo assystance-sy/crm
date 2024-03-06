@@ -183,7 +183,7 @@ const OrderDetailsScreen = ({route, navigation}) => {
   };
 
   const handleAddPress = () => {
-    navigation.navigate('Scanner');
+    navigation.navigate('Scanner', {prevScreen: 'Order Details'});
   };
 
   const handleViewItemPress = () => {

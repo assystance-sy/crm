@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import {View, StyleSheet, Text, Alert} from 'react-native';
+import {View, StyleSheet, Text, ToastAndroid} from 'react-native';
 import Button from '../components/Button';
 import DataContext from '../services/DataContext';
 import images from '../assets/images';
@@ -15,10 +15,8 @@ const ItemScreen = ({route, navigation}) => {
     try {
       let orders = await AsyncStorage.getItem('orders');
       if (orders === null) {
-        Alert.alert('Order not found', '', [
-          {text: 'OK', onPress: () => navigation.navigate('Home')},
-        ]);
-
+        ToastAndroid.show('Order not found', ToastAndroid.SHORT);
+        navigation.replace('Home');
         return;
       }
 
@@ -27,10 +25,8 @@ const ItemScreen = ({route, navigation}) => {
         o => o.orderNumber === sharedData.purchaseOrderNumber,
       );
       if (index === -1) {
-        Alert.alert('Order not found', '', [
-          {text: 'OK', onPress: () => navigation.navigate('Home')},
-        ]);
-
+        ToastAndroid.show('Order not found', ToastAndroid.SHORT);
+        navigation.replace('Home');
         return;
       }
 
@@ -50,14 +46,20 @@ const ItemScreen = ({route, navigation}) => {
 
       navigation.navigate('Scanner');
     } catch (e) {
-      Alert.alert('Failed to add item', `Error message: ${e.message}`, [
-        {text: 'OK'},
-      ]);
+      ToastAndroid.show('Failed to add item', ToastAndroid.SHORT);
     }
   };
 
   const handleDonePress = () => {
-    navigation.navigate('Home');
+    navigation.reset({
+      index: 3,
+      routes: [
+        {name: 'Home'},
+        {name: 'Orders'},
+        {name: 'Order Details'},
+        {name: 'Order Items'},
+      ],
+    });
   };
 
   const handleCancelPress = () => {

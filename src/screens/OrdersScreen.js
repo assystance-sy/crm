@@ -64,6 +64,7 @@ const OrdersScreen = () => {
     return (
       <TouchableOpacity
         style={styles.orderItem}
+        key={orderNumber}
         onPress={() => handleOrderPress(item)}>
         <View style={styles.orderListItem}>
           <Text style={styles.orderListItemLabel}>Order Number:</Text>
@@ -98,7 +99,7 @@ const OrdersScreen = () => {
     <View style={styles.container}>
       <SectionList
         sections={orders}
-        keyExtractor={item => item.date}
+        keyExtractor={item => item.orderNumber}
         renderItem={renderOrderItem}
         renderSectionHeader={({section: {title}}) => (
           <Text style={styles.sectionTitle}>{title}</Text>

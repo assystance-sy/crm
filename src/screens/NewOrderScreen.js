@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {View, StyleSheet, Alert} from 'react-native';
+import {View, StyleSheet, Alert, ToastAndroid} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Picker from '../components/Picker';
 import Button from '../components/Button';
@@ -57,15 +57,13 @@ const NewOrderScreen = () => {
   const handleCreatePress = async () => {
     try {
       if (!selectedStore) {
-        Alert.alert('No store selected', 'Please select a store', [
-          {text: 'OK', onPress: () => {}},
-        ]);
+        ToastAndroid.show('No store selected', ToastAndroid.SHORT);
         return;
       }
 
       await createPurchaseOrder(selectedStore);
 
-      navigation.push('Scanner');
+      navigation.replace('Scanner');
     } catch (error) {
       console.error('Error creating purchase order:', error);
     }
