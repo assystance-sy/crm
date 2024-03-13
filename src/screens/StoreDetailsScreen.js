@@ -16,18 +16,12 @@ const StoreDetailsScreen = ({route, navigation}) => {
   const [lng, lat] = coordinates || [];
 
   const handleAddressPress = () => {
+    const fullAddress = `${street}, ${city}, ${province}, ${postalCode}`;
     const scheme = Platform.select({
-      ios: 'maps://0,0?q=',
-      android: 'geo:0,0?q=',
+      ios: `maps://${lat},${lng}?q=${fullAddress}`,
+      android: `geo:${lat},${lng}?q=${fullAddress}`,
     });
-    const latLng = `${lat},${lng}`;
-    const label = merchant;
-    const url = Platform.select({
-      ios: `${scheme}${label}@${latLng}`,
-      android: `${scheme}${latLng}(${label})`,
-    });
-
-    Linking.openURL(url);
+    Linking.openURL(scheme);
   };
 
   const handlePhoneNumberPress = phoneNumber => {
