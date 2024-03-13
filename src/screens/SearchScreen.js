@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -14,7 +14,7 @@ import FastImage from 'react-native-fast-image';
 
 const SearchScreen = ({route, navigation}) => {
   const [matchedProducts, setMatchedProducts] = useState([]);
-  const [barcode, setBarcode] = useState('');
+  const [barcode, setBarcode] = useState(route?.params?.barcode || '');
   const [name, setName] = useState('');
 
   const searchByBarcode = () => {
@@ -74,6 +74,12 @@ const SearchScreen = ({route, navigation}) => {
       </TouchableOpacity>
     );
   };
+
+  useEffect(() => {
+    if (route?.params?.barcode) {
+      searchByBarcode();
+    }
+  }, []);
 
   return (
     <View style={styles.container}>

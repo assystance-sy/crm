@@ -34,11 +34,11 @@ const ScannerScreen = ({route, navigation}) => {
 
   const fetchProduct = async code => {
     try {
-      const matchedProduct = products.find(p =>
+      const matchedProducts = products.filter(p =>
         p.barcodes.some(b => b.includes(code)),
       );
 
-      if (!matchedProduct) {
+      if (matchedProducts.length === 0) {
         Alert.alert(
           'No product found',
           `No product matches with barcode ${code}`,
@@ -54,7 +54,11 @@ const ScannerScreen = ({route, navigation}) => {
       setBarcode('');
       setCameraOn(false);
 
-      navigation.push('Item', {product: matchedProduct});
+      if (matchedProducts.length === 1) {
+        navigation.push('Item', {product: matchedProducts[0]});
+      } else {
+        navigation.push('Search', {barcode: code});
+      }
     } catch (error) {
       console.error('Error fetching product:', error);
     }
