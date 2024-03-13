@@ -47,7 +47,9 @@ const StoreScreen = () => {
                 <Text style={styles.storeListItemLabel}>Phone:</Text>
                 <View>
                   {storeStaff.phones?.map(phone => (
-                    <Text style={styles.storeListItemValue}>{phone}</Text>
+                    <Text key={phone} style={styles.storeListItemValue}>
+                      {phone}
+                    </Text>
                   ))}
                 </View>
               </View>
