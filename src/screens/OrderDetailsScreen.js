@@ -22,6 +22,7 @@ const OrderDetailsScreen = ({route, navigation}) => {
   const [order, setOrder] = useState({});
   const [notes, setNotes] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [outOfStockProducts, setOutOfStockProducts] = useState([]);
 
   const fetchOrder = async () => {
     try {
@@ -150,13 +151,22 @@ const OrderDetailsScreen = ({route, navigation}) => {
           'Pack Size',
           'Code',
           'Quantity',
+          'Out Of Stock',
           '\n',
         ].join(',');
 
         const data = order.items
           .sort((a, b) => a.sku - b.sku)
           .map(item => {
-            const {name, brand, sku, barcodes, packSizes, quantity} = item;
+            const {
+              name,
+              brand,
+              sku,
+              barcodes,
+              packSizes,
+              quantity,
+              isOutOfStock,
+            } = item;
             return [
               name,
               brand,
@@ -164,6 +174,9 @@ const OrderDetailsScreen = ({route, navigation}) => {
               packSizes.join(' '),
               sku,
               quantity,
+              outOfStockProducts.some(product => product.sku === item.sku)
+                ? 'Y'
+                : '',
             ].join(',');
           })
           .join('\n');
@@ -199,8 +212,27 @@ const OrderDetailsScreen = ({route, navigation}) => {
     setIsEditing(true);
   };
 
+  const fetchOutOfStockProducts = async () => {
+    try {
+      let products = await AsyncStorage.getItem('products');
+      if (products === null) {
+        products = '[]';
+      }
+
+      setOutOfStockProducts(
+        JSON.parse(products).filter(product => product.status === 'outOfStock'),
+      );
+    } catch (e) {
+      ToastAndroid.show(
+        'Failed to fetch out of stock products',
+        ToastAndroid.SHORT,
+      );
+    }
+  };
+
   useEffect(() => {
     fetchOrder();
+    fetchOutOfStockProducts();
   }, [isFocused]);
 
   return (
@@ -250,7 +282,6 @@ const OrderDetailsScreen = ({route, navigation}) => {
               onChangeText={value => setNotes(value)}
               multiline={true}
               editable={isEditing}
-              onBlur={handleUpdateNotes}
             />
             <View style={styles.notesButtonGroup}>
               <Button

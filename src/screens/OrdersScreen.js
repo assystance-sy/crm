@@ -22,6 +22,7 @@ const OrdersScreen = () => {
   const navigation = useNavigation();
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [outOfStockProducts, setOutOfStockProducts] = useState([]);
 
   const handleOrderPress = order => {
     updateSharedData({purchaseOrderNumber: order.orderNumber});
@@ -85,11 +86,12 @@ const OrdersScreen = () => {
         'Pack Size',
         'Code',
         'Quantity',
+        'Out Of Stock',
         '\n',
       ].join(',');
 
       const data = order.items
-        .sort((a, b) => a.sku - b.sku)
+        .sort((a, b) => a.sku.localeCompare(b.sku))
         .map(item => {
           const {name, brand, sku, barcodes, packSizes, quantity} = item;
           return [
@@ -99,6 +101,9 @@ const OrdersScreen = () => {
             packSizes.join(' '),
             sku,
             quantity,
+            outOfStockProducts.some(product => product.sku === item.sku)
+              ? 'Y'
+              : '',
           ].join(',');
         })
         .join('\n');
@@ -147,8 +152,31 @@ const OrdersScreen = () => {
     }
   };
 
+  const fetchOutOfStockProducts = async () => {
+    try {
+      let products = await AsyncStorage.getItem('products');
+      if (products === null) {
+        products = '[]';
+      }
+
+      setOutOfStockProducts(
+        JSON.parse(products).filter(product => product.status === 'outOfStock'),
+      );
+
+      console.log(
+        JSON.parse(products).filter(product => product.status === 'outOfStock'),
+      );
+    } catch (e) {
+      ToastAndroid.show(
+        'Failed to fetch out of stock products',
+        ToastAndroid.SHORT,
+      );
+    }
+  };
+
   useEffect(() => {
     fetchOrders();
+    fetchOutOfStockProducts();
   }, [isFocused]);
 
   const renderOrderItem = ({item}) => {

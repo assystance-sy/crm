@@ -3,7 +3,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import React from 'react';
 
 const Picker = props => {
-  const {onValueChange, items, placeholder, label, labelStyle} = props;
+  const {onValueChange, items, placeholder, label, labelStyle, value} = props;
 
   return (
     <View style={styles.container}>
@@ -18,6 +18,7 @@ const Picker = props => {
               color: 'black',
             },
           }}
+          value={value}
         />
       </View>
     </View>

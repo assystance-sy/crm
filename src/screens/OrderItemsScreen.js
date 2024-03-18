@@ -20,6 +20,7 @@ const OrderItemsScreen = ({route, navigation}) => {
   const isFocused = useIsFocused();
   const [items, setItems] = useState([]);
   const [displayMode, setDisplayMode] = useState('detail');
+  const [outOfStockProducts, setOutOfStockProducts] = useState([]);
 
   const fetchOrder = async () => {
     try {
@@ -62,9 +63,34 @@ const OrderItemsScreen = ({route, navigation}) => {
     setItems(newList);
   };
 
+  const fetchOutOfStockProducts = async () => {
+    try {
+      let products = await AsyncStorage.getItem('products');
+      if (products === null) {
+        products = '[]';
+      }
+
+      setOutOfStockProducts(
+        JSON.parse(products).filter(product => product.status === 'outOfStock'),
+      );
+
+      console.log(
+        JSON.parse(products).filter(product => product.status === 'outOfStock'),
+      );
+    } catch (e) {
+      ToastAndroid.show(
+        'Failed to fetch out of stock products',
+        ToastAndroid.SHORT,
+      );
+    }
+  };
+
   const renderOrderItem = ({item}) => {
     const {image, name, sku, barcodes, packSizes, quantity, createdAt, brand} =
       item || {};
+    const isOutOfStock = outOfStockProducts.some(
+      product => product.sku === sku,
+    );
     return (
       <TouchableOpacity
         style={styles.productContainer}
@@ -76,6 +102,9 @@ const OrderItemsScreen = ({route, navigation}) => {
           resizeMode={FastImage.resizeMode.contain}
         />
         <View style={styles.productInfoContainer}>
+          {isOutOfStock && (
+            <Text style={styles.outOfStockLabel}>Out Of Stock</Text>
+          )}
           {displayMode === 'detail' && (
             <View style={styles.product}>
               <Text style={styles.productLabel}>Name:</Text>
@@ -123,6 +152,7 @@ const OrderItemsScreen = ({route, navigation}) => {
 
   useEffect(() => {
     fetchOrder();
+    fetchOutOfStockProducts();
   }, [isFocused]);
 
   return (
@@ -264,6 +294,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     width: 'fit-content',
     paddingVertical: 5,
+  },
+  outOfStockLabel: {
+    color: '#ff0000',
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
   },
 });
 

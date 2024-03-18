@@ -1,13 +1,23 @@
-import React, {useContext} from 'react';
-import {View, StyleSheet, Text, Image, Alert, ToastAndroid} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import {
+  View,
+  StyleSheet,
+  Text,
+  Image,
+  Alert,
+  ToastAndroid,
+  ScrollView,
+} from 'react-native';
 import Button from '../components/Button';
 import images from '../assets/images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DataContext from '../services/DataContext';
+import Picker from '../components/Picker';
 
 const EditItemScreen = ({route, navigation}) => {
   const {sharedData} = useContext(DataContext);
   const {product} = route.params;
+  const [status, setStatus] = useState('inStock');
 
   const handleQuantityPress = async quantity => {
     try {
@@ -98,9 +108,53 @@ const EditItemScreen = ({route, navigation}) => {
     navigation.goBack();
   };
 
+  const handleStatusChange = async newStatus => {
+    try {
+      let products = await AsyncStorage.getItem('products');
+      if (products === null) {
+        products = '[]';
+      }
+
+      products = JSON.parse(products);
+      const index = products.findIndex(o => o.sku === product.sku);
+      if (index === -1) {
+        products.push({sku: product.sku, status: newStatus});
+      } else {
+        products[index].status = newStatus;
+      }
+
+      await AsyncStorage.setItem('products', JSON.stringify(products));
+    } catch (e) {
+      ToastAndroid.show('Failed to update item', ToastAndroid.SHORT);
+    }
+  };
+
+  const checkIsOutOfStock = async () => {
+    try {
+      let products = await AsyncStorage.getItem('products');
+      if (products === null) {
+        products = '[]';
+      }
+
+      products = JSON.parse(products);
+      const index = products.findIndex(o => o.sku === product.sku);
+      if (index === -1) {
+        setStatus('inStock');
+      } else {
+        setStatus(products[index].status);
+      }
+    } catch (e) {
+      ToastAndroid.show('Failed to get product status', ToastAndroid.SHORT);
+    }
+  };
+
+  useEffect(() => {
+    checkIsOutOfStock();
+  }, [product]);
+
   return (
     <View style={styles.container}>
-      <View style={styles.productContainer}>
+      <ScrollView style={styles.productContainer}>
         <Image source={images[product.image]} style={styles.productImage} />
         <View style={styles.productInfo}>
           <Text style={styles.productInfoLabel}>Product Name:</Text>
@@ -135,7 +189,20 @@ const EditItemScreen = ({route, navigation}) => {
             ))}
           </View>
         </View>
-      </View>
+        <View style={{...styles.productInfo, alignItems: 'center'}}>
+          <Text style={styles.productInfoLabel}>Status:</Text>
+          <View style={{flex: 1}}>
+            <Picker
+              onValueChange={value => handleStatusChange(value)}
+              items={[
+                {label: 'In Stock', value: 'inStock'},
+                {label: 'Out Of Stock', value: 'outOfStock'},
+              ]}
+              value={status}
+            />
+          </View>
+        </View>
+      </ScrollView>
 
       <View style={styles.buttonGroup}>
         <Button label={'Remove'} onPress={handleRemovePress} />
