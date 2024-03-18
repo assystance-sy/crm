@@ -76,6 +76,7 @@ const OrdersScreen = () => {
         ].join(','),
       );
       orderInfo.push(['Notes', order.notes].join(','));
+      orderInfo.push(['No. of Items', order.items.length].join(','));
 
       const headers = [
         'Name',
