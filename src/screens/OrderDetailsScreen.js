@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -19,7 +19,6 @@ import {useIsFocused} from '@react-navigation/native';
 const OrderDetailsScreen = ({route, navigation}) => {
   const {sharedData} = useContext(DataContext);
   const isFocused = useIsFocused();
-  const notesRef = useRef();
   const [order, setOrder] = useState({});
   const [notes, setNotes] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -198,7 +197,6 @@ const OrderDetailsScreen = ({route, navigation}) => {
 
   const handleEditPress = () => {
     setIsEditing(true);
-    notesRef?.current?.focus();
   };
 
   useEffect(() => {
@@ -252,8 +250,6 @@ const OrderDetailsScreen = ({route, navigation}) => {
               onChangeText={value => setNotes(value)}
               multiline={true}
               editable={isEditing}
-              autoFocus={isEditing}
-              ref={notesRef}
               onBlur={handleUpdateNotes}
             />
             <View style={styles.notesButtonGroup}>
